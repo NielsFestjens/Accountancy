@@ -9,6 +9,7 @@ namespace Accountancy.Startup.Installers
     {
         public static void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             services.AddMvc();
         }
 

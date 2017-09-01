@@ -5,7 +5,6 @@ using Accountancy.Domain.Security;
 using Accountancy.Infrastructure.Database;
 using Accountancy.Infrastructure.Exceptions;
 using Accountancy.Infrastructure.Security;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,15 +36,15 @@ namespace Accountancy.Controllers
             var salt = user?.PasswordSalt ?? _securityService.GetSalt();
             var hashedPassword = _securityService.CalculateHash(command.Password, salt);
             if (user == null || user.Password != hashedPassword)
-                throw new BasUsernamePasswordCombinationException();
+                throw new BadUsernamePasswordCombinationException();
 
             await _securityService.SignIn(HttpContext, user);
         }
     }
 
-    public class BasUsernamePasswordCombinationException : KnownException
+    public class BadUsernamePasswordCombinationException : KnownException
     {
-        public BasUsernamePasswordCombinationException() : base("Bad username/password combination")
+        public BadUsernamePasswordCombinationException() : base("Bad username/password combination")
         {
         }
     }
