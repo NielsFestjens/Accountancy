@@ -1,6 +1,5 @@
 using System.Linq;
-using System.Security.Claims;
-using System.Security.Principal;
+using System.Threading.Tasks;
 using Accountancy.Domain.Security;
 using Accountancy.Infrastructure.Database;
 using Accountancy.Infrastructure.Exceptions;
@@ -30,7 +29,7 @@ namespace Accountancy.Controllers
         }
 
         [HttpPost]
-        public async void Post([FromBody]LoginCommand command)
+        public async Task Post([FromBody]LoginCommand command)
         {
             var user = _repository.Query<User>().SingleOrDefault(x => x.Username == command.Username);
             var salt = user?.PasswordSalt ?? _securityService.GetSalt();

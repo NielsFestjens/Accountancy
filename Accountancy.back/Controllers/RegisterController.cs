@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Accountancy.Domain.Security;
 using Accountancy.Infrastructure.Database;
 using Accountancy.Infrastructure.Exceptions;
@@ -28,7 +29,7 @@ namespace Accountancy.Controllers
         }
 
         [HttpPost]
-        public async void Register([FromBody] RegisterCommand command)
+        public async Task Register([FromBody] RegisterCommand command)
         {
             var salt = _securityService.GetSalt();
             var password = _securityService.CalculateHash(command.Password, salt);

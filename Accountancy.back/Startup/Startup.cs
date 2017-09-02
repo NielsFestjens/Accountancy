@@ -22,13 +22,13 @@ namespace Accountancy.Startup
             DatabaseInstaller.ConfigureServices(services);
             SecurityInstaller.ConfigureServices(services);
         }
-        
+
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             LoggingInstaller.Configure(app, env, loggerFactory, Configuration);
+            ExceptionInstaller.Configure(app, env, loggerFactory);
             SecurityInstaller.Configure(app, env, loggerFactory);
             MvcInstaller.Configure(app, env, loggerFactory);
-            ExceptionInstaller.Configure(app, env, loggerFactory);
         }
     }
 }
