@@ -3,10 +3,13 @@ import * as ReactDOM from "react-dom";
 import { Provider } from 'react-redux';
 import * as Redux from 'redux';
 import thunk from 'redux-thunk';
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.css';
 
 import App from "./components/App";
 import reducers from "./Reducers";
 import api from './middleware/api';
+import 'Styles/default.css';
 
 let createStoreWithMiddleware = Redux.applyMiddleware(api, thunk)(Redux.createStore);
 let store = createStoreWithMiddleware(reducers);

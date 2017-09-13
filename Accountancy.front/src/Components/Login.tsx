@@ -15,8 +15,8 @@ export default class Login extends Component<ILoginProps> {
 
     return (
       <div>
-        <input type='text' ref='username' className="form-control" placeholder='Username'/>
-        <input type='password' ref='password' className="form-control" placeholder='Password'/>
+        <input type='text' ref='username' className="form-control" placeholder='Username'/><br />
+        <input type='password' ref='password' className="form-control" placeholder='Password'/><br />
         <button onClick={(event) => this.handleLoginClick(event)} className="btn btn-primary">Login</button>
         <button onClick={(event) => this.handleRegisterClick(event)} className="btn btn-primary">Register</button>
 

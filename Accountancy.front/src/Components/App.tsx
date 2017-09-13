@@ -16,9 +16,7 @@ interface IAppStateProps {
   isSecretQuote: boolean;
 }
 
-interface IAppDispatchProps {
-
-}
+interface IAppDispatchProps { }
 
 type IAppProps = IAppStateProps & IAppDispatchProps;
 

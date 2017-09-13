@@ -15,11 +15,16 @@
     "webpack": "^3.5.5"
   },
   "dependencies": {
+    "bootstrap": "^4.0.0-beta",
+    "css-loader": "^0.28.7",
+    "jquery": "^3.2.1",
+    "popper.js": "^1.12.5",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-redux": "^5.0.6",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
-    "redux": "^3.7.2"
+    "redux": "^3.7.2",
+    "style-loader": "^0.18.2"
   }
 }

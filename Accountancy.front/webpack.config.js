@@ -1,4 +1,4 @@
-
+var webpack = require('webpack');
 var path = require("path");
 
 var config = {
@@ -25,11 +25,30 @@ var config = {
         test: /\.tsx?$/,
         use: 'awesome-typescript-loader',
         exclude: /node_modules/
+      },
+      {
+         test: /\.css$/, 
+         loader: "style-loader!css-loader"
       }
     ]
   },
+  plugins: [
+      new webpack.ProvidePlugin({
+        $: 'jquery',
+        jQuery: 'jquery',
+        'window.jQuery': 'jquery',
+        Popper: ['popper.js', 'default'],
+      }),
+      new webpack.HotModuleReplacementPlugin()
+  ],
 
-  devtool: "source-map"
+  devtool: "source-map",
+
+  devServer: {
+    contentBase: './dist',
+    hot: true,
+    historyApiFallback: true
+  },
 };
 
 module.exports = config;
