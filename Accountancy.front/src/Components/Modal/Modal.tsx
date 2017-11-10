@@ -48,72 +48,70 @@ interface IModalState {
     open: boolean
 }
 
-export class Modal extends Component<IModalProps, IModalState> {
+export class Modal<TProps extends IModalProps> extends Component<IModalProps, IModalState> {
     closeTimer: number;
 
-    constructor(props: IModalProps){
+    constructor(props: TProps) {
         super(props);
         this.state = {
             open : false
         }
     }
 
-    close(){
-        if(!this.props.onRequestClose || this.props.onRequestClose()){
+    close() {
+        if(!this.props.onRequestClose || this.props.onRequestClose()) {
             ModalManager.close();
         }
     }
 
-    handleKeyDown(event: KeyboardEvent){
+    handleKeyDown(event: KeyboardEvent) {
         if (event.keyCode == 27 /*esc*/) this.close();
     }
 
-    componentDidMount(){
+    componentDidMount() {
         const transitionTimeMS = this.getTransitionDuration();
-        setTimeout(() => this.setState({open : true}),0);
+        setTimeout(() => this.setState({ open : true }),0);
         onClose = (callback) => {
-            this.setState({open: false}, () => {
-            this.closeTimer = setTimeout(callback, transitionTimeMS);
+            this.setState({ open: false }, () => {
+                this.closeTimer = setTimeout(callback, transitionTimeMS);
             });
         };
     }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         onClose = null;
         clearTimeout(this.closeTimer);
     }
 
-    getTransitionDuration(){
+    getTransitionDuration() {
         const { effect } = this.props;
-        if(!effect.transition){
-            return defaultTransition.duration;
-        }
-        return effect.transition.duration || defaultTransition.duration;
+        this.props.effect.transition
+        return (effect.transition && effect.transition.duration) || defaultTransition.duration;
     }
 
-    render(){
+    render() {
         const { style, effect} = this.props;
         const { open } = this.state;
 
         let transition = effect.transition;
-        if(!transition){
+        if (!transition) {
             transition = defaultTransition;
-        }else{
+        } else {
             transition = Object.assign({}, defaultTransition,transition);
         }
         let transition_style = {
-            'transition': transition.property+' '+(transition.duration / 1000) + 's'+' '+transition.timingfunction
+            'transition': transition.property + ' ' + (transition.duration / 1000) + 's' + ' ' + transition.timingfunction
         };
 
         return (
             <div
             ref="overlay"
-            style={Object.assign({}, defaultStyles.overlay, (style && style.overlay) ? style.overlay : {},{ transition: 'opacity '+(transition.duration / 1000) + 's'+' linear',opacity: open ? 1 : 0})}
+            style={Object.assign({}, defaultStyles.overlay, (style && style.overlay) ? style.overlay : {}, { transition: 'opacity '+(transition.duration / 1000) + 's'+' linear',opacity: open ? 1 : 0})}
             onClick={this.close.bind(this)}>
 
             <div
                 ref="content"
-                style={Object.assign({}, defaultStyles.content,style ? (style.content ? style.content : {}) : {},transition_style,open ? effect.end : effect.begin)}
+                style={Object.assign({}, defaultStyles.content,style ? (style.content ? style.content : {}) : {}, transition_style,open ? effect.end : effect.begin)}
                 onClick={e => e.stopPropagation()}
                 onKeyDown={this.handleKeyDown.bind(this)}>
                 {this.props.children}
@@ -124,31 +122,31 @@ export class Modal extends Component<IModalProps, IModalState> {
 }
 
 var node: HTMLElement;
-var modals: Modal[] = [];
+var modals: Modal<any>[] = [];
 
 const renderModal = () => {
    if(modals.length == 0)
       return;
 
    const component = modals.shift();
-   if(!node){
+   if (!node){
       node = document.createElement('div');
       document.body.appendChild(node);
    }
-   ReactDOM.render(component, node);
+   ReactDOM.render(component as any, node);
 }
 
 export const ModalManager = {
-    open(component: Modal){
+    open(component: Modal<any>) {
        modals.push(component);
-       if(modals.length == 1){ // render the modal only if there is no other showing modals
+       if (modals.length == 1) {
           renderModal();
        }
     },
-    close(){
+    close() {
        onClose && onClose(() => {
          ReactDOM.unmountComponentAtNode(node);
-         renderModal();// render the other modals which are waiting.
+         renderModal();
        });
     }
 }
