@@ -1,6 +1,6 @@
 import ApiCaller from './ApiCaller';
 
-let apiCaller = new ApiCaller('http://localhost:65077/api/');
+let apiCaller = new ApiCaller('http://localhost:8081/api/');
 
 export function register(username: string, password: string) {
     const body = {

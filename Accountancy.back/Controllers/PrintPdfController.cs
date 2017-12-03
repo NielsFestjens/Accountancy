@@ -16,6 +16,9 @@ namespace Accountancy.Controllers
         [HttpGet]
         public ActionResult Get(int id)
         {
+            if (id == 0)
+                return RedirectToAction("Get", new {id = 1});
+
             var stream = new MemoryStream();
             var document = new Document(PageSize.A4, 50, 50, 25, 25); // total size: 595 x 842, inner size: 495 x 792
             var writer = PdfWriter.GetInstance(document, stream);
@@ -30,7 +33,8 @@ namespace Accountancy.Controllers
             document.Close();
             writer.Close();
             stream.Close();
-
+            
+            Response.Headers.Add("Content-Disposition", $"inline; filename={model.Year}-{model.Month} - Factuur van {model.IssuingCompany.FullName} voor {model.ReceivingCompany.FullName}.pdf");
             return new FileContentResult(stream.ToArray(), "application/pdf");
         }
 
@@ -214,7 +218,8 @@ namespace Accountancy.Controllers
                 {
                     FirstName = "Danny",
                     LastName = "Gladines"
-                }
+                },
+                Recipients = "karina.vereecken@qframe.be"
             };
 
             var cronos = new Company
@@ -223,46 +228,46 @@ namespace Accountancy.Controllers
                 FullName = "Cronos NV",
                 AddressLine = "Veldkant 35D",
                 CityLine = "2550 Kontich",
-                VAT = "BE 0443.807.959"
+                VAT = "BE 0443.807.959",
+                Recipients = "daria.wycislo@cronos.be; heidi.lens@cronos.be; karina.vereecken@qframe.be"
             };
 
-            var qframeInvoiceLines = new List<InvoiceLine>
+            var invoicedatas = new Dictionary<int, InvoiceData>
             {
-                new InvoiceLine
-                {
-                    Description = "Gepresteerde dagen",
-                    Amount = 2.78m,
-                    Price = 520.00m,
-                    VatType = VatType.Vat21
-                }
+                { 1, new InvoiceData { Year = 2017, Month = 10, Company = qframe, DaysWorked =  2.78m } },
+                { 2, new InvoiceData { Year = 2017, Month = 10, Company = cronos, DaysWorked = 17.94m } },
+
+                { 3, new InvoiceData { Year = 2017, Month = 11, Company = qframe, DaysWorked =  1.53m } },
+                { 4, new InvoiceData { Year = 2017, Month = 11, Company = cronos, DaysWorked = 20.28m } },
             };
 
-            var cronosInvoiceLines = new List<InvoiceLine>
-            {
-                new InvoiceLine
-                {
-                    Description = "Gepresteerde dagen",
-                    Amount = 17.94m,
-                    Price = 520.00m,
-                    VatType = VatType.Vat21
-                }
-            };
-
-            var qframeRecipients = "karina.vereecken@qframe.be";
-            var cronosrecipients = "daria.wycislo@cronos.be; heidi.lens@cronos.be; karina.vereecken@qframe.be";
+            var invoiceData = invoicedatas[id];
+            
             var model = new InvoiceModel
             {
                 Number = id,
-                Date = new DateTime(2017, 10, 31),
+                Year = invoiceData.Year,
+                Month = invoiceData.Month,
+                Date = new DateTime(invoiceData.Year, invoiceData.Month, DateTime.DaysInMonth(invoiceData.Year, invoiceData.Month)),
                 ExpiryPeriod = TimeSpan.FromDays(30),
                 IssuingCompany = nfSoftware,
-                ReceivingCompany = id == 1 ? qframe : cronos,
-                Recipients = id == 1 ? qframeRecipients : cronosrecipients,
-                InvoiceLines = id == 1 ? qframeInvoiceLines : cronosInvoiceLines,
+                ReceivingCompany = invoiceData.Company,
+                Recipients = invoiceData.Company.Recipients,
+                InvoiceLines = new List<InvoiceLine>
+                {
+                    new InvoiceLine
+                    {
+                        Description = "Gepresteerde dagen",
+                        Amount = invoiceData.DaysWorked,
+                        Price = 520.00m,
+                        VatType = VatType.Vat21
+                    }
+                },
             };
             return model;
         }
     }
+
     public static class PdfHelper
     {
         public static Font BaseFont = new Font(Font.FontFamily.UNDEFINED, 12);
@@ -399,6 +404,8 @@ namespace Accountancy.Controllers
         public decimal Vat21 => InvoiceLines.Where(x => x.VatType == VatType.Vat21).Sum(x => x.TotalExclVat * 21 / 100);
         public decimal Total => TotalExclVat + Vat21; 
         public string Recipients { get; set; }
+        public int Year { get; set; }
+        public int Month { get; set; }
     }
 
     public class Company
@@ -411,6 +418,7 @@ namespace Accountancy.Controllers
         public string BankAccount { get; set; }
         public Person ContactPerson { get; set; }
         public string Website { get; set; }
+        public string Recipients { get; set; }
     }
 
     public class Person
@@ -434,5 +442,13 @@ namespace Accountancy.Controllers
     public enum VatType
     {
         Vat21 = 21
+    }
+
+    public class InvoiceData
+    {
+        public decimal DaysWorked { get; set; }
+        public Company Company { get; set; }
+        public int Year { get; set; }
+        public int Month { get; set; }
     }
 }

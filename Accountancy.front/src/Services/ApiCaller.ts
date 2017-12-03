@@ -1,3 +1,5 @@
+import * as notifications from 'Components/Blocks/Notifications/Actions'
+
 export default class ApiCaller {
     constructor(private baseUri: string) {
     }
@@ -16,10 +18,11 @@ export default class ApiCaller {
             credentials: 'include'
         }
         return fetch(`${this.baseUri}${path}?${this.convertToQueryString(request)}`, config)
-              .then(response => response.json().then(content => ({ content, response })))
-              .catch(err => {
-                  console.log("Error: ", err);
-                  throw err;
+              .then(response => response.json().then(content => ({ response, content })))
+              .catch(error => {
+                  notifications.addError(error.message);
+                  console.log("Error: ", error);
+                  throw error;
               });
     }
     
@@ -27,14 +30,18 @@ export default class ApiCaller {
         const config: RequestInit = {
             method: 'POST',
             credentials: "include",
-            headers: { 'Content-Type': 'application/json' },
+            headers: [
+                ['Content-Type', 'application/json']
+            ],
             body: JSON.stringify(body)
         }
     
         return fetch(this.baseUri + path, config)
-        .catch(err => {
-            console.log("Error: ", err);
-            throw err;
-        });
+            .then(response => response.ok ? {response, content: undefined } : response.json().then(content => ({response, content })))
+            .catch(error => {
+                notifications.addError(error.message);
+                console.log("Error: ", error);
+                throw error;
+            });
     }
 }

@@ -1,0 +1,23 @@
+body {
+    background: #E8E8E8;
+}
+
+.notifications {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+}
+
+.notification {
+    background:#FF0000EE;
+    border-radius: 15px;
+    border: #000000 3px solid;
+    margin: 5px;
+    padding: 10px;
+}
+
+.notification:hover {
+    background:#FF0000;
+    border: #FFFFFF 3px solid;
+    cursor: pointer;
+}

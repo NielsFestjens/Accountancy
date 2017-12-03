@@ -1,11 +1,11 @@
 import { combineReducers } from 'redux';
 
 import auth from 'Components/Auth/Reducers';
-import quotes from 'Components/Quotes/Reducers';
+import notifications from 'Components/Blocks/Notifications/Reducers';
 
 const reducers = combineReducers({
   auth,
-  quotes
+  notifications
 });
 
 export default reducers;
