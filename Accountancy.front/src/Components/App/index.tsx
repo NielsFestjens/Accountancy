@@ -10,20 +10,21 @@ import Navbar from 'Components/Layout/Navbar';
 import NotificationsContainer from 'Components/Blocks/Notifications';
 import Notification from 'Components/Blocks/Notifications/Notification';
 import Dashboard from 'Components/Dashboard';
-import AppStartup from './AppStartup';
+import startup from './startup';
+import { User } from 'Components/Auth/models';
 
 interface IProps {
     dispatch?: (action: any) => void;
     history?: History;
 
     isAuthenticated: boolean;
-    username: string;
+    user: User;
     errorMessage: string;
 }
 
 var mapStateToProps = (state: any): IProps => ({
     isAuthenticated: state.auth.isAuthenticated,
-    username: state.auth.username,
+    user: state.auth.user,
     errorMessage: state.auth.errorMessage
 })
 
@@ -32,7 +33,7 @@ class App extends Component<IProps> {
         const props = this.props;
         return (
             <div>
-                <Navbar isAuthenticated={props.isAuthenticated} errorMessage={props.errorMessage} dispatch={props.dispatch} username={props.username} />
+                <Navbar isAuthenticated={props.isAuthenticated} errorMessage={props.errorMessage} dispatch={props.dispatch} user={props.user} />
                 <div className='container'>
                     <Switch>
                         <Route path="/dashboard" component={Dashboard} />
@@ -44,7 +45,7 @@ class App extends Component<IProps> {
     }
 
     componentWillMount() {
-        AppStartup(this.props.dispatch, this.props.history);
+        startup(this.props.dispatch, this.props.history);
     }
 }
 export default withRouter(connect(mapStateToProps)(App));

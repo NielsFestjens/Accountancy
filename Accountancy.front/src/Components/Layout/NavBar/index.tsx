@@ -5,11 +5,12 @@ import { Link } from 'react-router-dom';
 import Login from 'Components/Auth/Login';
 import Logout from 'Components/Auth/Logout';
 import { loginUser, registerUser, logoutUser } from 'Components/Auth/Actions';
+import { User } from 'Components/Auth/models';
 
 export interface IProps {
     dispatch?: (action: any) => void;
     isAuthenticated: boolean;
-    username: string;
+    user: User;
     errorMessage: string
 }
 
@@ -43,7 +44,7 @@ export default class Navbar extends Component<IProps> {
                             </li>
                             <li className="nav-item dropdown">
                                 <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    {props.username}
+                                    {props.user.username}
                                 </a>
                                 <div className="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <a className="dropdown-item" href="#" onClick={() => props.dispatch(logoutUser())}>Logout</a>

@@ -1,40 +1,45 @@
+import Action from 'Infrastructure/Action';
+import newState from 'Infrastructure/newState';
 import * as actions from './Actions';
+import { User } from './models';
 
-const initialAuthState = {
-  isFetching: false,
-  isAuthenticated: localStorage.getItem('id_token') ? true : false
+class State {
+    isFetching: boolean;
+    isAuthenticated: boolean;
+    user?: User;
 }
- 
-export default function auth(state = initialAuthState, action: any) {
-  switch (action.type) {
 
-    case actions.LOGIN_REQUEST:
-      return Object.assign({}, state, {
-        isFetching: true,
-        isAuthenticated: false
-      });
+const initialState: State = {
+    isFetching: false,
+    isAuthenticated: false
+}
 
-    case actions.LOGIN_SUCCESS:
-      return Object.assign({}, state, {
-        isFetching: false,
-        isAuthenticated: true,
-        username: action.payload.username
-      });
+export default function reduce(oldState = initialState, action: Action<any>) {
+    switch (action.type) {
 
-    case actions.LOGIN_FAILURE:
-      return Object.assign({}, state, {
-        isFetching: false,
-        isAuthenticated: false
-      });
-      
-    case actions.LOGOUT_SUCCESS:
-      return Object.assign({}, state, {
-        isFetching: true,
-        isAuthenticated: false
-      });
+        case actions.LOGIN_REQUEST:
+            return newState(initialState, state => {
+                state.isFetching = true;
+                state.isAuthenticated = false;
+            });
 
-    default:
-      return state;
+        case actions.LOGIN_SUCCESS:
+            const data = action.payload as actions.LOGIN_SUCCESS;
+            return newState(initialState, state => {
+                state.isFetching = false;
+                state.isAuthenticated = true;
+                state.user = data.user;
+            });
+        
+        case actions.LOGIN_FAILURE:
+        case actions.LOGOUT_SUCCESS:
+            return newState(initialState, state => {
+                state.isFetching = false;
+                state.isAuthenticated = false;
+            });
 
-  }
+        default:
+            return oldState;
+
+    }
 }

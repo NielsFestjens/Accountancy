@@ -4,8 +4,10 @@ import { connect } from 'react-redux'
 
 import Invoices from 'Components/Dashboard/Invoices';
 import { Invoice } from './models';
+import startup from './startup';
 
 interface IProps {
+    dispatch?: (action: any) => void;
     invoices: Invoice[]
 }
 
@@ -25,7 +27,7 @@ class App extends Component<IProps> {
     }
 
     componentWillMount() {
-        // todo: fetch invoices
+        startup(this.props.dispatch);
     }
 }
 export default connect(mapStateToProps)(App);
