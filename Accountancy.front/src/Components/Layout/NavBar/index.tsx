@@ -6,14 +6,14 @@ import Login from 'Components/Auth/Login';
 import Logout from 'Components/Auth/Logout';
 import { loginUser, registerUser, logoutUser } from 'Components/Auth/Actions';
 
-export interface INavbarProps {
+export interface IProps {
     dispatch?: (action: any) => void;
     isAuthenticated: boolean;
     username: string;
     errorMessage: string
 }
 
-export default class Navbar extends Component<INavbarProps> {
+export default class Navbar extends Component<IProps> {
 
     render() {
         const props = this.props

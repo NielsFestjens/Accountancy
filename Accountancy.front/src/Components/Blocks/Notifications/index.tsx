@@ -6,26 +6,17 @@ import Notification from 'Components/Blocks/Notifications/Notification';
 import * as actions from 'Components/Blocks/Notifications/Actions';
 import State from 'State';
 
-interface INotificationsContainerStateProps {
+interface IProps {
     dispatch?: (action: any) => void;
+    
     notifications: Notification[]
 }
 
-interface INotificationsContainerDispatchProps { 
+const mapStateToProps = (state: State): IProps => ({
+    notifications: state.notifications.notifications
+})
 
-}
-
-type INotificationsContainerProps = INotificationsContainerStateProps & INotificationsContainerDispatchProps;
-
-function mapStateToProps(state: State): INotificationsContainerStateProps {
-
-    const { notifications } = state;
-    return {
-        notifications: notifications.notifications
-    }
-}
-
-class NotificationsContainer extends Component<INotificationsContainerProps> {
+class NotificationsContainer extends Component<IProps> {
     render() {
         const { notifications } = this.props
         return (

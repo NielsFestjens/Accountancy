@@ -12,7 +12,7 @@ import Notification from 'Components/Blocks/Notifications/Notification';
 import Dashboard from 'Components/Dashboard';
 import AppStartup from 'Services/AppStartup';
 
-interface IAppStateProps {
+interface IProps {
     dispatch?: (action: any) => void;
     history?: History;
 
@@ -21,23 +21,13 @@ interface IAppStateProps {
     errorMessage: string;
 }
 
-interface IAppDispatchProps { }
+var mapStateToProps = (state: any): IProps => ({
+    isAuthenticated: state.auth.isAuthenticated,
+    username: state.auth.username,
+    errorMessage: state.auth.errorMessage
+})
 
-type IAppProps = IAppStateProps & IAppDispatchProps;
-
-function mapStateToProps(state: any): IAppStateProps {
-
-    const { auth } = state;
-    const { isAuthenticated, username, errorMessage } = auth;
-
-    return {
-        isAuthenticated,
-        username,
-        errorMessage
-    }
-}
-
-class App extends Component<IAppProps> {
+class App extends Component<IProps> {
     render() {
         const props = this.props;
         return (
