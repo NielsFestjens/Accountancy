@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "history": "registry:dt/history#4.5.0+20170113151845"
+  }
+}

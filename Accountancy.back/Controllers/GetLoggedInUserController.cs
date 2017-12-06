@@ -1,11 +1,13 @@
 using Accountancy.Domain.Security;
 using Accountancy.Infrastructure.Database;
 using Accountancy.Infrastructure.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Accountancy.Controllers
 {
     [Route("api/[controller]")]
+    [AllowAnonymous]
     public class GetLoggedInUserController : Controller
     {
         private readonly IRepository _repository;

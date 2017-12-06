@@ -106,8 +106,8 @@ export function loginUser(username: string, password: string) {
 export function logoutUser() {
   return (dispatch: (action: any) => void) => {
     dispatch(requestLogout());
-    localStorage.removeItem('id_token');
-    localStorage.removeItem('access_token');
-    dispatch(receiveLogout());
+    DataService.logout().then(result => {
+      dispatch(receiveLogout());
+    })
   }
 }

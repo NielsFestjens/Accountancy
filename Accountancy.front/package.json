@@ -1,10 +1,22 @@
 {
-  "name": "Accountancy",
+  "name": "accountancy",
+  "description": "An accountancy program",
+  "version": "0.0.1",
+  "author": {
+    "email": "festjens_niels@hotmail.com",
+    "name": "Niels Festjens",
+    "url": "https://github.com/NielsFestjens"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NielsFestjens/Accountancy"
+  },
   "scripts": {
     "build": "webpack",
-    "run": "webpack-dev-server --history-api-fallback"
+    "start": "webpack-dev-server --history-api-fallback"
   },
   "devDependencies": {
+    "@types/history": "^4.6.2",
     "@types/react": "^16.0.5",
     "@types/react-dom": "^15.5.4",
     "@types/react-redux": "^5.0.5",
