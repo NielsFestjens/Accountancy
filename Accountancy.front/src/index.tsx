@@ -10,10 +10,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import App from "Components/App";
 import reducers from "./Reducers";
-import api from 'Infrastructure/Middleware/api';
 import 'Styles/default.css';
 
-let createStoreWithMiddleware = Redux.applyMiddleware(api, thunk)(Redux.createStore);
+let createStoreWithMiddleware = Redux.applyMiddleware(thunk)(Redux.createStore);
 let store = createStoreWithMiddleware(reducers);
 
 ReactDOM.render(

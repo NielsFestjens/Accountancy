@@ -10,7 +10,7 @@ import Navbar from 'Components/Layout/Navbar';
 import NotificationsContainer from 'Components/Blocks/Notifications';
 import Notification from 'Components/Blocks/Notifications/Notification';
 import Dashboard from 'Components/Dashboard';
-import AppStartup from 'Services/AppStartup';
+import AppStartup from './AppStartup';
 
 interface IProps {
     dispatch?: (action: any) => void;

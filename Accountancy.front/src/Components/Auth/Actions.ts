@@ -1,5 +1,5 @@
 import { Action } from 'Infrastructure/Action';
-import * as DataService from 'Services/DataService';
+import * as DataService from './DataService';
 import * as notifications from 'Components/Blocks/Notifications/Actions';
 
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';

@@ -1,4 +1,4 @@
-import ApiCaller from './ApiCaller';
+import ApiCaller from 'Infrastructure/ApiCaller';
 
 let apiCaller = new ApiCaller('http://localhost:8081/api/');
 

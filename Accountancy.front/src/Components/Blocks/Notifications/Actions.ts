@@ -1,7 +1,6 @@
 import { Action } from 'Infrastructure/Action';
-import * as DataService from 'Services/DataService';
 import { Notification, NotificationType} from 'Components/Blocks/Notifications/Notification';
-import uniqueId from 'Services/uniqueId';
+import uniqueId from 'Infrastructure/uniqueId';
 
 export const ADD_NOTIFICATION = 'ADD_NOTIFICATION';
 export type ADD_NOTIFICATION = { notification: Notification };

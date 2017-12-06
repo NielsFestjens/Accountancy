@@ -1,4 +1,4 @@
-import { getLoggedInUser } from "Services/DataService";
+import { getLoggedInUser } from "Components/Auth/DataService";
 import { receiveLogin } from "Components/Auth/Actions";
 import { History } from 'history';
 
