@@ -11,7 +11,7 @@ const initialState: State = {
     notifications: []
 }
 
-export default function notifications(oldState = initialState, action: any) {
+export default function reducers(oldState = initialState, action: any) {
     switch (action.type) {
         case actions.ADD_NOTIFICATION:{
             const data = action.payload as actions.ADD_NOTIFICATION;

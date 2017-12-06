@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Accountancy.Controllers
+namespace Accountancy.Controllers.Auth
 {
     [Route("api/[controller]")]
     [AllowAnonymous]

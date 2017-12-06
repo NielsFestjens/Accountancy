@@ -18,7 +18,7 @@ export default class ApiCaller {
             credentials: 'include'
         }
         return fetch(`${this.baseUri}${path}?${this.convertToQueryString(request)}`, config)
-              .then(response => response.json().then(content => ({ response, content })))
+              .then(response => !response.ok ? { response, content: undefined } : response.json().then(content => ({ response, content })))
               .catch(error => {
                   notifications.addError(error.message);
                   console.log("Error: ", error);
@@ -37,7 +37,7 @@ export default class ApiCaller {
         }
     
         return fetch(this.baseUri + path, config)
-            .then(response => response.ok ? {response, content: undefined } : response.json().then(content => ({response, content })))
+            .then(response => response.ok ? {response, content: undefined } : response.json().then(content => ({ response, content })))
             .catch(error => {
                 notifications.addError(error.message);
                 console.log("Error: ", error);

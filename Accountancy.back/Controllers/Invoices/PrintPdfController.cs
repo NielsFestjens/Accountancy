@@ -7,7 +7,7 @@ using iTextSharp.text.pdf;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Accountancy.Controllers
+namespace Accountancy.Controllers.Invoices
 {
     [Route("api/[controller]")]
     [AllowAnonymous]
@@ -239,6 +239,9 @@ namespace Accountancy.Controllers
 
                 { 3, new InvoiceData { Year = 2017, Month = 11, Company = qframe, DaysWorked =  1.53m } },
                 { 4, new InvoiceData { Year = 2017, Month = 11, Company = cronos, DaysWorked = 20.28m } },
+
+                { 5, new InvoiceData { Year = 2017, Month = 12, Company = qframe, DaysWorked =   0.0m } },
+                { 6, new InvoiceData { Year = 2017, Month = 12, Company = cronos, DaysWorked =   0.0m } },
             };
 
             var invoiceData = invoicedatas[id];

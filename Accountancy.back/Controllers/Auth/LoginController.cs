@@ -7,7 +7,7 @@ using Accountancy.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Accountancy.Controllers
+namespace Accountancy.Controllers.Auth
 {
     public class LoginCommand
     {
@@ -17,12 +17,12 @@ namespace Accountancy.Controllers
 
     [Route("api/[controller]")]
     [AllowAnonymous]
-    public class LoginController : Controller
+    public class GetInvoicesController : Controller
     {
         private readonly IRepository _repository;
         private readonly ISecurityService _securityService;
 
-        public LoginController(IRepository repository, ISecurityService securityService)
+        public GetInvoicesController(IRepository repository, ISecurityService securityService)
         {
             _repository = repository;
             _securityService = securityService;

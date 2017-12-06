@@ -14,7 +14,7 @@ const initialState: State = {
     isAuthenticated: false
 }
 
-export default function reduce(oldState = initialState, action: Action<any>) {
+export default function reducers(oldState = initialState, action: Action<any>) {
     switch (action.type) {
 
         case actions.LOGIN_REQUEST:

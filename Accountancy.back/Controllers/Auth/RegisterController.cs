@@ -7,7 +7,7 @@ using Accountancy.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Accountancy.Controllers
+namespace Accountancy.Controllers.Auth
 {
     public class RegisterCommand
     {
