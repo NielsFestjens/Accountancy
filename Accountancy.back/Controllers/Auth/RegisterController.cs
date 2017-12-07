@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Accountancy.Domain.Security;
+using Accountancy.Domain.Auth;
 using Accountancy.Infrastructure.Database;
 using Accountancy.Infrastructure.Exceptions;
 using Accountancy.Infrastructure.Security;

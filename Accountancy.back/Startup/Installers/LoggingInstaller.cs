@@ -7,9 +7,9 @@ namespace Accountancy.Startup.Installers
 {
     public class LoggingInstaller
     {
-        public static void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfigurationRoot configuration)
+        public static void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfigurationSection loggingConfig)
         {
-            loggerFactory.AddConsole(configuration.GetSection("Logging"));
+            loggerFactory.AddConsole(loggingConfig);
             loggerFactory.AddDebug();
         }
     }

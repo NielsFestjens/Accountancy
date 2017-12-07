@@ -1,4 +1,4 @@
-﻿using Accountancy.Domain.Security;
+﻿using Accountancy.Domain.Auth;
 using Microsoft.EntityFrameworkCore;
 
 namespace Accountancy.Infrastructure.Database

@@ -1,4 +1,4 @@
-using Accountancy.Domain.Security;
+using Accountancy.Domain.Auth;
 using Accountancy.Infrastructure.Database;
 using Accountancy.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;

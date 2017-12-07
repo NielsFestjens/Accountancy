@@ -19,13 +19,13 @@ namespace Accountancy.Startup
         public void ConfigureServices(IServiceCollection services)
         {
             MvcInstaller.ConfigureServices(services);
-            DatabaseInstaller.ConfigureServices(services, Configuration);
+            DatabaseInstaller.ConfigureServices(services, Configuration.GetSection("Database"));
             SecurityInstaller.ConfigureServices(services);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            LoggingInstaller.Configure(app, env, loggerFactory, Configuration);
+            LoggingInstaller.Configure(app, env, loggerFactory, Configuration.GetSection("Logging"));
             ExceptionInstaller.Configure(app, env, loggerFactory);
             SecurityInstaller.Configure(app, env, loggerFactory);
             MvcInstaller.Configure(app, env, loggerFactory);

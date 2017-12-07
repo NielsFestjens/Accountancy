@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Accountancy.Domain.Security;
+using Accountancy.Domain.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 

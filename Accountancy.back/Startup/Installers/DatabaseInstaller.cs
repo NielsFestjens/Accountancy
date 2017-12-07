@@ -7,10 +7,10 @@ namespace Accountancy.Startup.Installers
 {
     public class DatabaseInstaller
     {
-        public static void ConfigureServices(IServiceCollection services, IConfigurationRoot configuration)
+        public static void ConfigureServices(IServiceCollection services, IConfigurationSection databaseConfig)
         {
-            var config = configuration.GetSection("Database");
-            services.AddEntityFrameworkInMemoryDatabase().AddDbContext<DatabaseContext>(options => options.UseSqlServer(config["Connectionstring"]));
+            services.AddEntityFrameworkSqlServer();
+            services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(databaseConfig["Connectionstring"]));
             services.AddTransient<IRepository, Repository>();
         }
     }

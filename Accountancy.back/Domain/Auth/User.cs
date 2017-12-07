@@ -1,6 +1,6 @@
 ﻿using Accountancy.Infrastructure.Database;
 
-namespace Accountancy.Domain.Security
+namespace Accountancy.Domain.Auth
 {
     public class User : IEntity<int>
     {
