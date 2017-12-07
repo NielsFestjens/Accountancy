@@ -136,11 +136,11 @@ namespace Accountancy.Controllers.Invoices
 
             table.AddCell(PdfHelper.GetTitleCell("Omschrijving"));
             table.AddCell(PdfHelper.GetSpacerCell());
-            table.AddCell(PdfHelper.GetTitleCell("Aantal")).AlignRight();
+            table.AddCell(PdfHelper.GetTitleCell("Aantal").AlignRight());
             table.AddCell(PdfHelper.GetSpacerCell());
-            table.AddCell(PdfHelper.GetTitleCell("Prijs")).AlignRight();
+            table.AddCell(PdfHelper.GetTitleCell("Prijs").AlignRight());
             table.AddCell(PdfHelper.GetSpacerCell());
-            table.AddCell(PdfHelper.GetTitleCell("Totaal")).AlignRight();
+            table.AddCell(PdfHelper.GetTitleCell("Totaal").AlignRight());
 
             foreach (var invoiceLine in model.InvoiceLines)
             {
@@ -152,32 +152,32 @@ namespace Accountancy.Controllers.Invoices
                 table.AddCell(PdfHelper.GetSpacerCell());
                 table.AddCell(PdfHelper.GetCell(invoiceLine.TotalExclVat.ToString("C2")).AlignRight());
             }
-            PdfHelper.BorderBottomRow(table.Rows.Last());
+            PdfHelper.BorderBottomRow(table.Rows.OfType<PdfPRow>().Last());
 
             table.AddCell(PdfHelper.GetCell("Totaal Excl. BTW", PdfHelper.BoldFont));
             table.AddCell(PdfHelper.GetSpacerCell());
-            table.AddCell(PdfHelper.GetCell("")).AlignRight();
+            table.AddCell(PdfHelper.GetCell("").AlignRight());
             table.AddCell(PdfHelper.GetSpacerCell());
-            table.AddCell(PdfHelper.GetCell("")).AlignRight();
+            table.AddCell(PdfHelper.GetCell("").AlignRight());
             table.AddCell(PdfHelper.GetSpacerCell());
-            table.AddCell(PdfHelper.GetCell(model.TotalExclVat.ToString("C2"), PdfHelper.BoldFont)).AlignRight();
+            table.AddCell(PdfHelper.GetCell(model.TotalExclVat.ToString("C2"), PdfHelper.BoldFont).AlignRight());
 
             table.AddCell(PdfHelper.GetCell("BTW 21%"));
             table.AddCell(PdfHelper.GetSpacerCell());
-            table.AddCell(PdfHelper.GetCell("")).AlignRight();
+            table.AddCell(PdfHelper.GetCell("").AlignRight());
             table.AddCell(PdfHelper.GetSpacerCell());
-            table.AddCell(PdfHelper.GetCell("")).AlignRight();
+            table.AddCell(PdfHelper.GetCell("").AlignRight());
             table.AddCell(PdfHelper.GetSpacerCell());
-            table.AddCell(PdfHelper.GetCell(model.Vat21.ToString("C2"))).AlignRight();
-            PdfHelper.BorderBottomRow(table.Rows.Last());
+            table.AddCell(PdfHelper.GetCell(model.Vat21.ToString("C2")).AlignRight());
+            PdfHelper.BorderBottomRow(table.Rows.OfType<PdfPRow>().Last());
 
             table.AddCell(PdfHelper.GetCell("Totaal", PdfHelper.BoldFont));
             table.AddCell(PdfHelper.GetSpacerCell());
-            table.AddCell(PdfHelper.GetCell("")).AlignRight();
+            table.AddCell(PdfHelper.GetCell("").AlignRight());
             table.AddCell(PdfHelper.GetSpacerCell());
-            table.AddCell(PdfHelper.GetCell("")).AlignRight();
+            table.AddCell(PdfHelper.GetCell("").AlignRight());
             table.AddCell(PdfHelper.GetSpacerCell());
-            table.AddCell(PdfHelper.GetCell(model.Total.ToString("C2"), PdfHelper.BoldFont)).AlignRight();
+            table.AddCell(PdfHelper.GetCell(model.Total.ToString("C2"), PdfHelper.BoldFont).AlignRight());
 
             return table;
         }
@@ -273,7 +273,7 @@ namespace Accountancy.Controllers.Invoices
 
     public static class PdfHelper
     {
-        public static Font BaseFont = new Font(Font.FontFamily.UNDEFINED, 12);
+        public static Font BaseFont = new Font(Font.UNDEFINED, 12);
         public static Font TitleFont = new Font(BaseFont.BaseFont, BaseFont.Size + 8, Font.BOLD);
         public static Font BoldFont = new Font(BaseFont.BaseFont, BaseFont.Size, Font.BOLD);
 
@@ -286,7 +286,7 @@ namespace Accountancy.Controllers.Invoices
 
         public static void SurroundBorders(PdfPTable table)
         {
-            var rows = table.Rows;
+            var rows = table.Rows.OfType<PdfPRow>().ToList();
             if (!rows.Any())
                 return;
             

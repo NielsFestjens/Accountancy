@@ -17,20 +17,20 @@ export default class Facturen extends Component<IINvoicesProps> {
             <div>
                 <h3>Facturen</h3>
                 <table>
-                        <thead>
-                            <tr>
-                                <th>Naam</th>
-                                <th>Status</th>
+                    <thead>
+                        <tr>
+                            <th>Naam</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {this.props.invoices.map(x => 
+                            <tr key={x.id}>
+                                <td><a href={x.link} target="_blank">{x.name}</a></td>
+                                <td>{InvoiceStatus[x.status]}</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {this.props.invoices.map(x => 
-                                <tr key={x.id}>
-                                    <td><a href={x.link} target="_blank">{x.name}</a></td>
-                                    <td>{InvoiceStatus[x.status]}</td>
-                                </tr>
-                            )}
-                        </tbody>
+                        )}
+                    </tbody>
                 </table>
             </div>
         )

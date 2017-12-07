@@ -19,7 +19,7 @@ namespace Accountancy.Startup
         public void ConfigureServices(IServiceCollection services)
         {
             MvcInstaller.ConfigureServices(services);
-            DatabaseInstaller.ConfigureServices(services);
+            DatabaseInstaller.ConfigureServices(services, Configuration);
             SecurityInstaller.ConfigureServices(services);
         }
 

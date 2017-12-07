@@ -17,12 +17,12 @@ namespace Accountancy.Controllers.Auth
 
     [Route("api/[controller]")]
     [AllowAnonymous]
-    public class GetInvoicesController : Controller
+    public class LoginController : Controller
     {
         private readonly IRepository _repository;
         private readonly ISecurityService _securityService;
 
-        public GetInvoicesController(IRepository repository, ISecurityService securityService)
+        public LoginController(IRepository repository, ISecurityService securityService)
         {
             _repository = repository;
             _securityService = securityService;
