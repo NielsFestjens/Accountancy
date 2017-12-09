@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Accountancy.Domain.Invoices;
 using Accountancy.Infrastructure.Database;
 using Accountancy.Infrastructure.Security;
 using Microsoft.AspNetCore.Mvc;
@@ -21,45 +23,12 @@ namespace Accountancy.Controllers.Dashboard
         [HttpGet]
         public async Task<IEnumerable<InvoiceDto>> Get()
         {
-            return new List<InvoiceDto>
+            return _repository.Query<Invoice>().Select(x => new InvoiceDto
             {
-                new InvoiceDto
-                {
-                    Id = 1,
-                    Name = "2017/10 - Qframe",
-                    Status = InvoiceStatus.Paid
-                },
-                new InvoiceDto
-                {
-                    Id = 2,
-                    Name = "2017/10 - Cronos",
-                    Status = InvoiceStatus.Paid
-                },
-                new InvoiceDto
-                {
-                    Id = 3,
-                    Name = "2017/11 - Qframe",
-                    Status = InvoiceStatus.Sent
-                },
-                new InvoiceDto
-                {
-                    Id = 4,
-                    Name = "2017/11 - Cronos",
-                    Status = InvoiceStatus.Sent
-                },
-                new InvoiceDto
-                {
-                    Id = 5,
-                    Name = "2017/11 - Qframe",
-                    Status = InvoiceStatus.Draft
-                },
-                new InvoiceDto
-                {
-                    Id = 6,
-                    Name = "2017/11 - Cronos",
-                    Status = InvoiceStatus.Draft
-                }
-            };
+                Id = x.Id,
+                Name = $"{x.Year}/{x.Month} - {x.ReceivingCompany.Name}",
+                Status = x.Status
+            });
         }
     }
 

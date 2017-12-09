@@ -1,4 +1,5 @@
 ﻿using Accountancy.Domain.Auth;
+using Accountancy.Domain.Invoices;
 using Microsoft.EntityFrameworkCore;
 
 namespace Accountancy.Infrastructure.Database
@@ -7,13 +8,16 @@ namespace Accountancy.Infrastructure.Database
     {
         public DatabaseContext(DbContextOptions options) : base(options)
         {
-            Database.EnsureCreated();
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
             builder.Entity<User>().HasKey(x => x.Id);
+            builder.Entity<Invoice>().HasKey(x => x.Id);
+            builder.Entity<InvoiceLine>().HasKey(x => x.Id);
+            builder.Entity<Person>().HasKey(x => x.Id);
+            builder.Entity<Company>().HasKey(x => x.Id);
         }
     }
 }

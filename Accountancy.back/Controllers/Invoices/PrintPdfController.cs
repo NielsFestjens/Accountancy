@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Accountancy.Domain.Invoices;
+using Accountancy.Infrastructure.Database;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Accountancy.Controllers.Invoices
 {
@@ -13,6 +16,13 @@ namespace Accountancy.Controllers.Invoices
     [AllowAnonymous]
     public class PrintPdfController : Controller
     {
+        private readonly IRepository _repository;
+
+        public PrintPdfController(IRepository repository)
+        {
+            _repository = repository;
+        }
+
         [HttpGet]
         public ActionResult Get(int id)
         {
@@ -26,7 +36,14 @@ namespace Accountancy.Controllers.Invoices
             document.Open();
             var directContent = writer.DirectContent;
 
-            var model = GetModel(id);
+            var model = _repository
+                .Query<Invoice>()
+                .Include(x => x.IssuingCompany)
+                .Include(x => x.IssuingCompany.ContactPerson)
+                .Include(x => x.ReceivingCompany)
+                .Include(x => x.ReceivingCompany.ContactPerson)
+                .Include(x => x.InvoiceLines)
+                .Single(x => x.Id == id);
 
             GenerateContent(document, directContent, model);
 
@@ -38,7 +55,7 @@ namespace Accountancy.Controllers.Invoices
             return new FileContentResult(stream.ToArray(), "application/pdf");
         }
 
-        private static void GenerateContent(IElementListener document, PdfContentByte directContent, InvoiceModel model)
+        private static void GenerateContent(IElementListener document, PdfContentByte directContent, Invoice model)
         {
             AddIssuingCompany(directContent, model);
             AddInvoiceHeadingPart(directContent, model);
@@ -56,7 +73,7 @@ namespace Accountancy.Controllers.Invoices
             document.Add(GetFooterPart(model));
         }
 
-        private static void AddIssuingCompany(PdfContentByte directContent, InvoiceModel model)
+        private static void AddIssuingCompany(PdfContentByte directContent, Invoice model)
         {
             var table = new PdfPTable(3) { HorizontalAlignment = Element.ALIGN_LEFT, WidthPercentage = 100 };
             table.SetWidths(new float[] { 18, 5, 78 });
@@ -89,7 +106,7 @@ namespace Accountancy.Controllers.Invoices
             columnText.Go();
         }
 
-        private static void AddInvoiceHeadingPart(PdfContentByte directContent, InvoiceModel model)
+        private static void AddInvoiceHeadingPart(PdfContentByte directContent, Invoice model)
         {
             var table = new PdfPTable(2) { HorizontalAlignment = Element.ALIGN_LEFT, WidthPercentage = 100 };
             table.SetWidths(new float[] {55, 45});
@@ -112,12 +129,12 @@ namespace Accountancy.Controllers.Invoices
             columnText.Go();
         }
 
-        private static IElement GetHeaderPart(InvoiceModel model)
+        private static IElement GetHeaderPart(Invoice model)
         {
             return new Paragraph(new Phrase(model.IssuingCompany.Name, PdfHelper.TitleFont));
         }
 
-        private static IElement GetCompaniesPart(InvoiceModel model)
+        private static IElement GetCompaniesPart(Invoice model)
         {
             var table = new PdfPTable(1) { HorizontalAlignment = Element.ALIGN_LEFT, WidthPercentage = 50 };
 
@@ -129,7 +146,7 @@ namespace Accountancy.Controllers.Invoices
             return table;
         }
 
-        private static IElement GetInvoiceLinesPart(InvoiceModel model)
+        private static IElement GetInvoiceLinesPart(Invoice model)
         {
             var table = new PdfPTable(7) {HorizontalAlignment = Element.ALIGN_LEFT, WidthPercentage = 100};
             table.SetWidths(new float[] {52, 1, 15, 1, 15, 1, 15});
@@ -182,92 +199,9 @@ namespace Accountancy.Controllers.Invoices
             return table;
         }
 
-        private static IElement GetFooterPart(InvoiceModel model)
+        private static IElement GetFooterPart(Invoice model)
         {
-            return new Paragraph($"Gelieve het bedrag van {model.Total:C2} over te maken op {model.IssuingCompany.BankAccount} binnen de {model.ExpiryPeriod.TotalDays} dagen.", PdfHelper.SmallItalicFont);
-        }
-
-        private static InvoiceModel GetModel(int id)
-        {
-            var nfSoftware = new Company
-            {
-                Name = "N.F. Software",
-                FullName = "N.F. Software Comm.V",
-                AddressLine = "Hollebeekstraat 5 bus 3",
-                CityLine = "2840 Rumst",
-                VAT = "BE 0681.952.956",
-                BankAccount = "BE75 7360 4179 6051",
-                ContactPerson = new Person
-                {
-                    FirstName = "Niels",
-                    LastName = "Festjens",
-                    Email = "festjens_niels@hotmail.com",
-                    Phone = "+32 477 / 60 39 05"
-                },
-                Website = null
-            };
-
-            var qframe = new Company
-            {
-                Name = "Qframe",
-                FullName = "Qframe NV",
-                AddressLine = "Veldkant 33A",
-                CityLine = "2550 Kontich",
-                VAT = "BE 0887.377.180",
-                ContactPerson = new Person
-                {
-                    FirstName = "Danny",
-                    LastName = "Gladines"
-                },
-                Recipients = "karina.vereecken@qframe.be"
-            };
-
-            var cronos = new Company
-            {
-                Name = "Cronos",
-                FullName = "Cronos NV",
-                AddressLine = "Veldkant 35D",
-                CityLine = "2550 Kontich",
-                VAT = "BE 0443.807.959",
-                Recipients = "daria.wycislo@cronos.be; heidi.lens@cronos.be; karina.vereecken@qframe.be"
-            };
-
-            var invoicedatas = new Dictionary<int, InvoiceData>
-            {
-                { 1, new InvoiceData { Year = 2017, Month = 10, Company = qframe, DaysWorked =  2.78m } },
-                { 2, new InvoiceData { Year = 2017, Month = 10, Company = cronos, DaysWorked = 17.94m } },
-
-                { 3, new InvoiceData { Year = 2017, Month = 11, Company = qframe, DaysWorked =  1.53m } },
-                { 4, new InvoiceData { Year = 2017, Month = 11, Company = cronos, DaysWorked = 20.28m } },
-
-                { 5, new InvoiceData { Year = 2017, Month = 12, Company = qframe, DaysWorked =   0.0m } },
-                { 6, new InvoiceData { Year = 2017, Month = 12, Company = cronos, DaysWorked =   0.0m } },
-            };
-
-            var invoiceData = invoicedatas[id];
-            
-            var model = new InvoiceModel
-            {
-                Number = id,
-                Year = invoiceData.Year,
-                Month = invoiceData.Month,
-                Date = new DateTime(invoiceData.Year, invoiceData.Month, DateTime.DaysInMonth(invoiceData.Year, invoiceData.Month)),
-                ExpiryPeriod = TimeSpan.FromDays(30),
-                IssuingCompany = nfSoftware,
-                ReceivingCompany = invoiceData.Company,
-                Recipients = invoiceData.Company.Recipients,
-                InvoiceLines = new List<InvoiceLine>
-                {
-                    new InvoiceLine
-                    {
-                        Description = "Gepresteerde dagen",
-                        Amount = invoiceData.DaysWorked,
-                        Price = 520.00m,
-                        VatType = VatType.Vat21
-                    }
-                },
-            };
-            return model;
+            return new Paragraph($"Gelieve het bedrag van {model.Total:C2} over te maken op {model.IssuingCompany.BankAccount} binnen de {model.ExpiryPeriodDays} dagen.", PdfHelper.SmallItalicFont);
         }
     }
 
@@ -388,63 +322,6 @@ namespace Accountancy.Controllers.Invoices
             action();
             return item;
         }
-    }
-
-    public class InvoiceModel
-    {
-        public int Number { get; set; }
-        public string FullNumber => $"{Date.Year}{Number:00000}";
-        public DateTime Date { get; set; }
-        public TimeSpan ExpiryPeriod { get; set; }
-        public DateTime ExpiryDate => Date.Add(ExpiryPeriod);
-
-        public Company IssuingCompany { get; set; }
-        public Company ReceivingCompany { get; set; }
-
-        public List<InvoiceLine> InvoiceLines { get; set; }
-        public decimal TotalExclVat => InvoiceLines.Sum(x => x.TotalExclVat);
-        public decimal TotalExclVatForVat21 => InvoiceLines.Where(x => x.VatType == VatType.Vat21).Sum(x => x.TotalExclVat);
-        public decimal Vat21 => InvoiceLines.Where(x => x.VatType == VatType.Vat21).Sum(x => x.TotalExclVat * 21 / 100);
-        public decimal Total => TotalExclVat + Vat21; 
-        public string Recipients { get; set; }
-        public int Year { get; set; }
-        public int Month { get; set; }
-    }
-
-    public class Company
-    {
-        public string Name { get; set; }
-        public string FullName { get; set; }
-        public string AddressLine { get; set; }
-        public string CityLine { get; set; }
-        public string VAT { get; set; }
-        public string BankAccount { get; set; }
-        public Person ContactPerson { get; set; }
-        public string Website { get; set; }
-        public string Recipients { get; set; }
-    }
-
-    public class Person
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string FullName => $"{FirstName} {LastName}";
-        public string Email { get; set; }
-        public string Phone { get; set; }
-    }
-
-    public class InvoiceLine
-    {
-        public string Description { get; set; }
-        public decimal Amount { get; set; }
-        public decimal Price { get; set; }
-        public decimal TotalExclVat => Amount * Price;
-        public VatType VatType { get; set; }
-    }
-
-    public enum VatType
-    {
-        Vat21 = 21
     }
 
     public class InvoiceData
