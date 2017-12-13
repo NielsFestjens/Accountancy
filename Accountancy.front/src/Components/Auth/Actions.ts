@@ -8,10 +8,7 @@ export const requestLogin = (username: string, password: string): Action => ({ t
 
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export type LOGIN_SUCCESS = { user: User };
-export const receiveLogin = (user: User): Action<LOGIN_SUCCESS> => ({
-    type: LOGIN_SUCCESS,
-    payload: { user: user }
-})
+export const receiveLogin = (user: User): Action<LOGIN_SUCCESS> => ({ type: LOGIN_SUCCESS, payload: { user: user } })
 
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
 export const loginError = (): Action => ({ type: LOGIN_FAILURE });
@@ -24,7 +21,6 @@ export type LOGOUT_SUCCESS = { isFetching: boolean, isAuthenticated: boolean };
 export const receiveLogout = (): Action<LOGOUT_SUCCESS> => ({ type: LOGOUT_SUCCESS })
 
 export function registerUser(username: string, password: string) {
-
     return (dispatch: (action: any) => void) => {
         dispatch(requestLogin(username, password));
 
@@ -44,7 +40,6 @@ export function registerUser(username: string, password: string) {
 }
 
 export function loginUser(username: string, password: string) {
-
     return (dispatch: (action: any) => void) => {
         dispatch(requestLogin(username, password));
 

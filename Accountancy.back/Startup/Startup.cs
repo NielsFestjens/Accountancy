@@ -20,6 +20,7 @@ namespace Accountancy.Startup
         {
             MvcInstaller.ConfigureServices(services);
             DatabaseInstaller.ConfigureServices(services, Configuration.GetSection("ConnectionStrings"));
+            DocumentIntaller.ConfigureServices(services);
             SecurityInstaller.ConfigureServices(services);
         }
 

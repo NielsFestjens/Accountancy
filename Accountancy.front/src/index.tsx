@@ -11,6 +11,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import App from "Components/App";
 import reducers from "./Reducers";
 import 'Styles/default.css';
+import 'font-awesome/css/font-awesome.css';
 
 let createStoreWithMiddleware = Redux.applyMiddleware(thunk)(Redux.createStore);
 let store = createStoreWithMiddleware(reducers);

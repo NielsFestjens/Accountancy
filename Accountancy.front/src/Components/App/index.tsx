@@ -10,8 +10,10 @@ import Navbar from 'Components/Layout/Navbar';
 import NotificationsContainer from 'Components/Blocks/Notifications';
 import Notification from 'Components/Blocks/Notifications/Notification';
 import Dashboard from 'Components/Dashboard';
+import Invoices from 'Components/Invoices';
 import startup from './startup';
 import { User } from 'Components/Auth/models';
+import State from 'State';
 
 interface IProps {
     dispatch?: (action: any) => void;
@@ -19,13 +21,11 @@ interface IProps {
 
     isAuthenticated: boolean;
     user: User;
-    errorMessage: string;
 }
 
-var mapStateToProps = (state: any): IProps => ({
+var mapStateToProps = (state: State): IProps => ({
     isAuthenticated: state.auth.isAuthenticated,
     user: state.auth.user,
-    errorMessage: state.auth.errorMessage
 })
 
 class App extends Component<IProps> {
@@ -33,11 +33,14 @@ class App extends Component<IProps> {
         const props = this.props;
         return (
             <div>
-                <Navbar isAuthenticated={props.isAuthenticated} errorMessage={props.errorMessage} dispatch={props.dispatch} user={props.user} />
+                <Navbar isAuthenticated={props.isAuthenticated}  dispatch={props.dispatch} user={props.user} />
                 <div className='container'>
-                    <Switch>
-                        <Route path="/dashboard" component={Dashboard} />
-                    </Switch>
+                    {props.isAuthenticated && 
+                        <Switch>
+                            <Route path="/dashboard" component={Dashboard} />
+                            <Route path="/invoices" component={Invoices} />
+                        </Switch>
+                    }
                 </div>
                 <NotificationsContainer />
             </div>
@@ -48,4 +51,5 @@ class App extends Component<IProps> {
         startup(this.props.dispatch, this.props.history);
     }
 }
+
 export default withRouter(connect(mapStateToProps)(App));

@@ -8,6 +8,7 @@ namespace Accountancy.Infrastructure.Database
         T Get<T>(int id) where T : class, IEntity<int>;
         T GetOrDefault<T>(int id) where T : class, IEntity<int>;
         int AddAndSave<T>(T item) where T : class;
+        void Save();
     }
 
     public class Repository : IRepository
@@ -38,6 +39,11 @@ namespace Accountancy.Infrastructure.Database
         {
             _databaseContext.Set<T>().Add(item);
             return _databaseContext.SaveChanges();
+        }
+
+        public void Save()
+        {
+            _databaseContext.SaveChanges();
         }
     }
 }

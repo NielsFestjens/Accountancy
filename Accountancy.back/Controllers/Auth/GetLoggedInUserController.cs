@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Accountancy.Controllers.Auth
 {
-    [Route("api/[controller]")]
+    [Route("api/Auth/[controller]")]
     [AllowAnonymous]
     public class GetLoggedInUserController : Controller
     {

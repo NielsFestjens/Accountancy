@@ -3,7 +3,7 @@ import newState from 'Infrastructure/newState';
 import * as actions from './Actions';
 import { User } from './models';
 
-class State {
+export class State {
     isFetching: boolean;
     isAuthenticated: boolean;
     user?: User;

@@ -1,4 +1,5 @@
 import * as notifications from 'Components/Blocks/Notifications/Actions'
+import dispatch from 'Infrastructure/dispatch';
 
 export default class ApiCaller {
     constructor(private baseUri: string) {
@@ -20,8 +21,8 @@ export default class ApiCaller {
         return fetch(`${this.baseUri}${path}?${this.convertToQueryString(request)}`, config)
               .then(response => !response.ok ? { response, content: undefined } : response.json().then(content => ({ response, content })))
               .catch(error => {
-                  notifications.addError(error.message);
-                  console.log("Error: ", error);
+                dispatch(notifications.addError(error.message));
+                  console.error(error);
                   throw error;
               });
     }
@@ -37,11 +38,22 @@ export default class ApiCaller {
         }
     
         return fetch(this.baseUri + path, config)
-            .then(response => response.ok ? {response, content: undefined } : response.json().then(content => ({ response, content })))
+            .then(this.handlePostResponse)
             .catch(error => {
-                notifications.addError(error.message);
-                console.log("Error: ", error);
+                dispatch(notifications.addError(error.message));
+                console.error( error);
                 throw error;
             });
+    }
+
+    private handlePostResponse(response: Response) {
+        if (response.ok)
+            return { response, content: undefined as any };
+
+        if (response.status === 500)
+            return response.json().then(content => ({ response, content }));
+        
+        dispatch(notifications.addError('Er is iets misgegaan tijdens het uitvoeren van een opdracht op de server'));
+        console.error(response);
     }
 }

@@ -1,28 +1,9 @@
 import ApiCaller from 'Infrastructure/ApiCaller';
 import { apiUri } from 'config';
 
-let apiCaller = new ApiCaller(apiUri);
+let apiCaller = new ApiCaller(apiUri + 'Auth/');
 
-export function register(username: string, password: string) {
-    const body = {
-        Username: username,
-        Password: password
-    }
-    return apiCaller.post('register', body);
-}
-
-export function login(username: string, password: string) {
-    const body = {
-        Username: username,
-        Password: password
-    }
-    return apiCaller.post('login', body);
-}
-
-export function getLoggedInUser() {
-    return apiCaller.get('getLoggedInUser')
-}
-
-export function logout() {
-    return apiCaller.post('logout');
-}
+export const register = (username: string, password: string) => apiCaller.post('register', { username, password });
+export const login = (username: string, password: string) => apiCaller.post('login', { username, password });
+export const getLoggedInUser = () => apiCaller.get('getLoggedInUser');
+export const logout = () => apiCaller.post('logout');

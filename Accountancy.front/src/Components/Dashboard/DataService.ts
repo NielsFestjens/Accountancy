@@ -1,9 +1,9 @@
 import ApiCaller from 'Infrastructure/ApiCaller';
 import { apiUri } from 'config';
 import { InvoiceDto } from './models';
+import { InvoiceStatus } from 'Components/Invoices/models';
 
-let apiCaller = new ApiCaller(apiUri);
+const apiCaller = new ApiCaller(apiUri + 'Dashboard/');
 
-export function getDashboardInvoices(): Promise<InvoiceDto[]> {
-    return apiCaller.get('dashboard/getInvoices').then(response => response.content);
-}
+export const getDashboardInvoices = (): Promise<InvoiceDto[]> => apiCaller.get('getInvoices').then(response => response.content);
+export const updateInvoiceStatus = (invoice: InvoiceDto, status: InvoiceStatus): Promise<any> => apiCaller.post('updateInvoiceStatus', { id: invoice.id, status });

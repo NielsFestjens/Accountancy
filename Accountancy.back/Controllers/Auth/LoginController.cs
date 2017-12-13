@@ -15,7 +15,7 @@ namespace Accountancy.Controllers.Auth
         public string Password { get; set; }
     }
 
-    [Route("api/[controller]")]
+    [Route("api/Auth/[controller]")]
     [AllowAnonymous]
     public class LoginController : Controller
     {

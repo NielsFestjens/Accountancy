@@ -21,28 +21,14 @@ namespace Accountancy.Controllers.Dashboard
         }
 
         [HttpGet]
-        public async Task<IEnumerable<InvoiceDto>> Get()
+        public async Task<IEnumerable<object>> Get()
         {
-            return _repository.Query<Invoice>().Select(x => new InvoiceDto
+            return _repository.Query<Invoice>().Select(x => new
             {
-                Id = x.Id,
+                x.Id,
                 Name = $"{x.Year}/{x.Month} - {x.ReceivingCompany.Name}",
-                Status = x.Status
+                x.Status
             });
         }
-    }
-
-    public class InvoiceDto
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public InvoiceStatus Status { get; set; }
-    }
-
-    public enum InvoiceStatus
-    {
-        Draft,
-        Sent,
-        Paid,
     }
 }

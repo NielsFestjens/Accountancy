@@ -21,3 +21,7 @@ body {
     border: #FFFFFF 3px solid;
     cursor: pointer;
 }
+
+.action-icon {
+    margin: 5px;
+}

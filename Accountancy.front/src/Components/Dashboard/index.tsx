@@ -4,32 +4,33 @@ import { connect } from 'react-redux'
 
 import Invoices from 'Components/Dashboard/Invoices';
 import { InvoiceDto } from './models';
-import startup from './startup';
+import * as Actions from "./Actions";
+import State from 'State';
 
 interface IProps {
     dispatch?: (action: any) => void;
     invoices: InvoiceDto[]
 }
 
-var mapStateToProps = (state: any): IProps => {
+var mapStateToProps = (state: State): IProps => {
     return  { 
         invoices: state.dashboard.invoices
     };
 };
 
-class App extends Component<IProps> {
+class Dashboard extends Component<IProps> {
     render() {
         const props = this.props;
         return (
             <div>
                 <h2>Le dashboard</h2>
-                <Invoices invoices={props.invoices} />
+                <Invoices invoices={props.invoices} dispatch={props.dispatch} />
             </div>
         )
     }
 
     componentWillMount() {
-        startup(this.props.dispatch);
+        this.props.dispatch(Actions.fetchInvoices());
     }
 }
-export default connect(mapStateToProps)(App);
+export default connect(mapStateToProps)(Dashboard);

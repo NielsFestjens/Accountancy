@@ -11,7 +11,6 @@ export interface IProps {
     dispatch?: (action: any) => void;
     isAuthenticated: boolean;
     user: User;
-    errorMessage: string
 }
 
 export default class Navbar extends Component<IProps> {
@@ -31,7 +30,6 @@ export default class Navbar extends Component<IProps> {
 
                     {!props.isAuthenticated &&
                         <Login
-                            errorMessage={props.errorMessage}
                             onLoginClick={(username: string, password: string) => props.dispatch(loginUser(username, password))}
                             onRegisterClick={(username: string, password: string) => props.dispatch(registerUser(username, password))}
                         />

@@ -3,7 +3,7 @@ import newState from 'Infrastructure/newState';
 import * as actions from './Actions';
 import Notification from 'Components/Blocks/Notifications/Notification';
 
-class State {
+export class State {
     notifications: Notification[];
 }
 
