@@ -28,7 +28,7 @@ export default class Invoices extends Component<IProps> {
                                 <table className="table">
                                     <thead>
                                         <tr>
-                                            <th>Naam</th>
+                                            <th>Bestemmeling</th>
                                             <th>Bedrag</th>
                                             <th>Status</th>
                                             <th>Acties</th>
@@ -37,7 +37,7 @@ export default class Invoices extends Component<IProps> {
                                     <tbody>
                                         {invoiceMonth.invoices.map(x => 
                                             <tr key={x.id}>
-                                                <td><Link to={`/Invoices/Invoice/${x.id}`}>{x.name}</Link></td>
+                                                <td><Link to={`/Invoices/Invoice/${x.id}`}>{x.receivingCompany}</Link></td>
                                                 <td>{ x.total }</td>
                                                 <td>{ InvoiceStatus[x.status] }</td>
                                                 <td>

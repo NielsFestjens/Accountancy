@@ -14,7 +14,7 @@ export class InvoiceDto {
     id: number;
     year: number;
     month: number;
-    name: string;
+    receivingCompany: string;
     status: InvoiceStatus;
     total: number;
     link: string;

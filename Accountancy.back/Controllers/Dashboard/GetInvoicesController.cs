@@ -30,7 +30,7 @@ namespace Accountancy.Controllers.Dashboard
                 x.Id,
                 x.Year,
                 x.Month,
-                Name = $"{x.Year}/{x.Month} - {x.ReceivingCompany.Name}",
+                ReceivingCompany = x.ReceivingCompany.Name,
                 x.Status,
                 x.Total
             });
