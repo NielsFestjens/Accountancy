@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Component, PropTypes } from 'react'
+import { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators, Dispatch } from "redux";
 import { Route, Switch, withRouter } from 'react-router';

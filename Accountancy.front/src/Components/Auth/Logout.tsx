@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Component, PropTypes } from 'react'
+import { Component } from 'react'
 
 export interface ILogoutProps {
     onLogoutClick: () => void;
