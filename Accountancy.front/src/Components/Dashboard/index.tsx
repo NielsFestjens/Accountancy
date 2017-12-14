@@ -3,20 +3,18 @@ import { Component, PropTypes } from 'react';
 import { connect } from 'react-redux'
 
 import Invoices from 'Components/Dashboard/Invoices';
-import { InvoiceDto } from './models';
+import { InvoiceDto, InvoiceYear } from './models';
 import * as Actions from "./Actions";
 import State from 'State';
 
 interface IProps {
     dispatch?: (action: any) => void;
-    invoices: InvoiceDto[]
+    invoices: InvoiceYear[]
 }
 
-var mapStateToProps = (state: State): IProps => {
-    return  { 
-        invoices: state.dashboard.invoices
-    };
-};
+var mapStateToProps = (state: State): IProps => ({
+    invoices: state.dashboard.invoiceYears
+});
 
 class Dashboard extends Component<IProps> {
     render() {

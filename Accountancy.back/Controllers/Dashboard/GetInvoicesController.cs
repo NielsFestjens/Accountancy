@@ -5,6 +5,7 @@ using Accountancy.Domain.Invoices;
 using Accountancy.Infrastructure.Database;
 using Accountancy.Infrastructure.Security;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Accountancy.Controllers.Dashboard
 {
@@ -23,11 +24,15 @@ namespace Accountancy.Controllers.Dashboard
         [HttpGet]
         public async Task<IEnumerable<object>> Get()
         {
-            return _repository.Query<Invoice>().Select(x => new
+            var t = _repository.Query<Invoice>().Include(x => x.ReceivingCompany).Include(x => x.InvoiceLines).ToList();
+            return t.Select(x => new
             {
                 x.Id,
+                x.Year,
+                x.Month,
                 Name = $"{x.Year}/{x.Month} - {x.ReceivingCompany.Name}",
-                x.Status
+                x.Status,
+                x.Total
             });
         }
     }

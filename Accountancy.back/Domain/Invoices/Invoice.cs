@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Accountancy.Controllers.Dashboard;
 using Accountancy.Infrastructure.Database;
 
 namespace Accountancy.Domain.Invoices
@@ -22,9 +21,9 @@ namespace Accountancy.Domain.Invoices
 
         public string FullNumber => $"{Date.Year}{Id:00000}";
         public DateTime ExpiryDate => Date.AddDays(ExpiryPeriodDays);
-        public decimal TotalExclVat => InvoiceLines.Sum(x => x.TotalExclVat);
-        public decimal TotalExclVatForVat21 => InvoiceLines.Where(x => x.VatType == VatType.Vat21).Sum(x => x.TotalExclVat);
-        public decimal Vat21 => InvoiceLines.Where(x => x.VatType == VatType.Vat21).Sum(x => x.TotalExclVat * 21 / 100);
+        public decimal TotalExclVat => InvoiceLines?.Sum(x => x.TotalExclVat) ?? 0;
+        public decimal TotalExclVatForVat21 => InvoiceLines?.Where(x => x.VatType == VatType.Vat21).Sum(x => x.TotalExclVat) ?? 0;
+        public decimal Vat21 => InvoiceLines?.Where(x => x.VatType == VatType.Vat21).Sum(x => x.TotalExclVat * 21 / 100) ?? 0;
         public decimal Total => TotalExclVat + Vat21;
     }
 }
