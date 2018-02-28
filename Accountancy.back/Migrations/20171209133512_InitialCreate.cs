@@ -73,13 +73,15 @@ namespace Accountancy.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Number = table.Column<int>(nullable: false),
                     Date = table.Column<DateTime>(nullable: false),
                     ExpiryPeriodDays = table.Column<int>(nullable: false),
                     IssuingCompanyId = table.Column<int>(nullable: true),
                     Month = table.Column<int>(nullable: false),
                     ReceivingCompanyId = table.Column<int>(nullable: true),
                     Status = table.Column<int>(nullable: false),
-                    Year = table.Column<int>(nullable: false)
+                    Year = table.Column<int>(nullable: false),
+                    TheirReference = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

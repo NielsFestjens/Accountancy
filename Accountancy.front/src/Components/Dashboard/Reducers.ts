@@ -21,7 +21,7 @@ export default function reducers(oldState = initialState, action: any) {
         case actions.DASHBOARD_FETCHED_INVOICES: {
             const data = action.payload as actions.DASHBOARD_FETCHED_INVOICES;
             return newState(oldState, state => {
-                data.invoices.forEach(invoice => invoice.link = `${apiUri}/Invoices/PrintPdf?id=${invoice.id}`);
+                data.invoices.forEach(invoice => invoice.link = `${apiUri}Invoices/PrintPdf?id=${invoice.id}`);
                 state.invoices = data.invoices;
                 state.invoiceYears = groupBy(data.invoices, x => x.year)
                     .map(x => ({

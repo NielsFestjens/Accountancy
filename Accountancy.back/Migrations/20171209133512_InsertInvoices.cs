@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Accountancy.Controllers.Dashboard;
 using Accountancy.Domain.Invoices;
 using Accountancy.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -67,12 +66,14 @@ namespace Accountancy.Migrations
                     Recipients = "daria.wycislo@cronos.be; heidi.lens@cronos.be; karina.vereecken@qframe.be"
                 };
                 context.Add(cronos);
+                context.SaveChanges();
 
-                Action<Company, int, int, InvoiceStatus, decimal?> createInvoice = (receiver, year, month, status, amount) =>
+                Action<int, Company, int, int, InvoiceStatus, decimal?, string> createInvoice = (number, receiver, year, month, status, amount, theirReference) =>
                 {
                     var date = new DateTime(year, month, DateTime.DaysInMonth(year, month));
                     context.Add(new Invoice
                     {
+                        Number = number,
                         IssuingCompany = nfSoftware,
                         ReceivingCompany = receiver,
                         Year = year,
@@ -80,6 +81,7 @@ namespace Accountancy.Migrations
                         Date = date,
                         ExpiryPeriodDays = 30,
                         Status = status,
+                        TheirReference = theirReference,
                         InvoiceLines = amount == null ? new List<InvoiceLine>() : new List<InvoiceLine>
                         {
                             new InvoiceLine
@@ -91,14 +93,20 @@ namespace Accountancy.Migrations
                             }
                         }
                     });
+                    context.SaveChanges();
                 };
+                
+                createInvoice(1, qframe, 2017, 10, InvoiceStatus.Paid,  2.78m, null);
+                createInvoice(2, cronos, 2017, 10, InvoiceStatus.Paid, 17.94m, null);
+                createInvoice(3, qframe, 2017, 11, InvoiceStatus.Paid,  1.53m, null);
+                createInvoice(4, cronos, 2017, 11, InvoiceStatus.Paid, 20.28m, null);
+                createInvoice(5, qframe, 2017, 12, InvoiceStatus.Paid,  1.13m, null);
+                createInvoice(6, cronos, 2017, 12, InvoiceStatus.Paid, 22.44m, null);
 
-                createInvoice(qframe, 2017, 10, InvoiceStatus.Paid, 2.78m);
-                createInvoice(cronos, 2017, 10, InvoiceStatus.Paid, 17.94m);
-                createInvoice(qframe, 2017, 11, InvoiceStatus.Sent, 1.53m);
-                createInvoice(cronos, 2017, 11, InvoiceStatus.Sent, 20.28m);
-                createInvoice(qframe, 2017, 12, InvoiceStatus.Draft, null);
-                createInvoice(cronos, 2017, 12, InvoiceStatus.Draft, null);
+                createInvoice(1, qframe, 2018, 01, InvoiceStatus.Paid,  1.51m, null);
+                createInvoice(2, cronos, 2018, 01, InvoiceStatus.Paid, 25.20m, null);
+                createInvoice(3, qframe, 2018, 02, InvoiceStatus.Sent,  0.25m, null);
+                createInvoice(4, cronos, 2018, 02, InvoiceStatus.Sent, 24.38m, "CRO18/0257/0001");
 
                 context.SaveChanges();
             }

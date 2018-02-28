@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using Accountancy.Domain.Invoices;
 using Accountancy.Infrastructure.Pdf;
@@ -86,7 +87,7 @@ namespace Accountancy.Controllers.Documents
         private static void AddInvoiceHeadingPart(PdfContentByte directContent, Invoice invoice)
         {
             var table = new PdfPTable(2) { HorizontalAlignment = Element.ALIGN_LEFT, WidthPercentage = 100 };
-            table.SetWidths(new float[] { 55, 45 });
+            table.SetWidths(new float[] { 55, 55 });
 
             table.AddCell(PdfHelper.GetCell("Factuurdatum", PdfHelper.BoldFont).AlignRight());
             table.AddCell(PdfHelper.GetCell(invoice.Date.ToShortDateString()));
@@ -97,11 +98,17 @@ namespace Accountancy.Controllers.Documents
             table.AddCell(PdfHelper.GetCell("Factuurnummer", PdfHelper.BoldFont).AlignRight());
             table.AddCell(PdfHelper.GetCell(invoice.FullNumber).BorderRight());
 
+            if (!string.IsNullOrEmpty(invoice.TheirReference))
+            {
+                table.AddCell(PdfHelper.GetCell("Uw referentie", PdfHelper.BoldFont).AlignRight());
+                table.AddCell(PdfHelper.GetCell(invoice.TheirReference).BorderRight());
+            }
+
             PdfHelper.SurroundBorders(table);
 
             var columnText = new ColumnText(directContent);
             var size = directContent.PdfDocument.PageSize;
-            columnText.SetSimpleColumn(size.Right - 250, size.Top - 135, size.Right - 50, size.Top - 500);
+            columnText.SetSimpleColumn(size.Right - 300, size.Top - 135, size.Right - 50, size.Top - 500);
             columnText.AddElement(table);
             columnText.Go();
         }

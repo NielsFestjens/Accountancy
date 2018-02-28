@@ -73,6 +73,8 @@ namespace Accountancy.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int>("Number");
+
                     b.Property<DateTime>("Date");
 
                     b.Property<int>("ExpiryPeriodDays");
@@ -86,6 +88,8 @@ namespace Accountancy.Migrations
                     b.Property<int>("Status");
 
                     b.Property<int>("Year");
+
+                    b.Property<string>("TheirReference");
 
                     b.HasKey("Id");
 
