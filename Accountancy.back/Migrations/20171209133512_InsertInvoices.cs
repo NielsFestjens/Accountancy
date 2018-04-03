@@ -68,7 +68,7 @@ namespace Accountancy.Migrations
                 context.Add(cronos);
                 context.SaveChanges();
 
-                Action<int, Company, int, int, InvoiceStatus, decimal?, string> createInvoice = (number, receiver, year, month, status, amount, theirReference) =>
+                void CreateInvoice(int number, Company receiver, int year, int month, InvoiceStatus status, decimal? amount, string theirReference)
                 {
                     var date = new DateTime(year, month, DateTime.DaysInMonth(year, month));
                     context.Add(new Invoice
@@ -82,31 +82,35 @@ namespace Accountancy.Migrations
                         ExpiryPeriodDays = 30,
                         Status = status,
                         TheirReference = theirReference,
-                        InvoiceLines = amount == null ? new List<InvoiceLine>() : new List<InvoiceLine>
-                        {
-                            new InvoiceLine
+                        InvoiceLines = amount == null
+                            ? new List<InvoiceLine>()
+                            : new List<InvoiceLine>
                             {
-                                Description = "Gepresteerde dagen",
-                                Amount = amount.Value,
-                                Price = 520.00m,
-                                VatType = VatType.Vat21
+                                new InvoiceLine
+                                {
+                                    Description = "Gepresteerde dagen",
+                                    Amount = amount.Value,
+                                    Price = 520.00m,
+                                    VatType = VatType.Vat21
+                                }
                             }
-                        }
                     });
                     context.SaveChanges();
-                };
-                
-                createInvoice(1, qframe, 2017, 10, InvoiceStatus.Paid,  2.78m, null);
-                createInvoice(2, cronos, 2017, 10, InvoiceStatus.Paid, 17.94m, null);
-                createInvoice(3, qframe, 2017, 11, InvoiceStatus.Paid,  1.53m, null);
-                createInvoice(4, cronos, 2017, 11, InvoiceStatus.Paid, 20.28m, null);
-                createInvoice(5, qframe, 2017, 12, InvoiceStatus.Paid,  1.13m, null);
-                createInvoice(6, cronos, 2017, 12, InvoiceStatus.Paid, 22.44m, null);
+                }
 
-                createInvoice(1, qframe, 2018, 01, InvoiceStatus.Paid,  1.51m, null);
-                createInvoice(2, cronos, 2018, 01, InvoiceStatus.Paid, 25.20m, null);
-                createInvoice(3, qframe, 2018, 02, InvoiceStatus.Sent,  0.25m, null);
-                createInvoice(4, cronos, 2018, 02, InvoiceStatus.Sent, 24.38m, "CRO18/0257/0001");
+                CreateInvoice(1, qframe, 2017, 10, InvoiceStatus.Paid,  2.78m, null);
+                CreateInvoice(2, cronos, 2017, 10, InvoiceStatus.Paid, 17.94m, null);
+                CreateInvoice(3, qframe, 2017, 11, InvoiceStatus.Paid,  1.53m, null);
+                CreateInvoice(4, cronos, 2017, 11, InvoiceStatus.Paid, 20.28m, null);
+                CreateInvoice(5, qframe, 2017, 12, InvoiceStatus.Paid,  1.13m, null);
+                CreateInvoice(6, cronos, 2017, 12, InvoiceStatus.Paid, 22.44m, null);
+
+                CreateInvoice(1, qframe, 2018, 01, InvoiceStatus.Paid,  1.51m, null);
+                CreateInvoice(2, cronos, 2018, 01, InvoiceStatus.Paid, 25.20m, null);
+                CreateInvoice(3, qframe, 2018, 02, InvoiceStatus.Sent,  0.25m, null);
+                CreateInvoice(4, cronos, 2018, 02, InvoiceStatus.Sent, 24.38m, "CRO18/0257/0001");
+                CreateInvoice(5, qframe, 2018, 03, InvoiceStatus.Sent,  0.38m, null);
+                CreateInvoice(6, cronos, 2018, 03, InvoiceStatus.Sent, 28.13m, "CRO18/0257/0001");
 
                 context.SaveChanges();
             }
