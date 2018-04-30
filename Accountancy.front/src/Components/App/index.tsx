@@ -33,7 +33,7 @@ class App extends Component<IProps> {
         const props = this.props;
         return (
             <div>
-                <Navbar isAuthenticated={props.isAuthenticated}  dispatch={props.dispatch} user={props.user} />
+                <Navbar isAuthenticated={props.isAuthenticated}  dispatch={props.dispatch} user={props.user} history={props.history} />
                 <div className='container'>
                     {props.isAuthenticated && 
                         <Switch>

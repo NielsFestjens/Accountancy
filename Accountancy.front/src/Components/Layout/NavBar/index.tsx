@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { History } from 'history';
 
 import Login from 'Components/Auth/Login';
 import Logout from 'Components/Auth/Logout';
@@ -11,6 +12,7 @@ export interface IProps {
     dispatch?: (action: any) => void;
     isAuthenticated: boolean;
     user: User;
+    history: History
 }
 
 export default class Navbar extends Component<IProps> {
@@ -30,8 +32,8 @@ export default class Navbar extends Component<IProps> {
 
                     {!props.isAuthenticated &&
                         <Login
-                            onLoginClick={(username: string, password: string) => props.dispatch(loginUser(username, password))}
-                            onRegisterClick={(username: string, password: string) => props.dispatch(registerUser(username, password))}
+                            onLoginClick={(username: string, password: string) => props.dispatch(loginUser(username, password, props.history))}
+                            onRegisterClick={(username: string, password: string) => props.dispatch(registerUser(username, password, props.history))}
                         />
                     }
 

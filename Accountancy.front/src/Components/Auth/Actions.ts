@@ -2,6 +2,7 @@ import Action from 'Infrastructure/Action';
 import * as notifications from 'Components/Blocks/Notifications/Actions';
 import * as DataService from './DataService';
 import { User } from './models';
+import { History } from 'history';
 
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';
 export const requestLogin = (username: string, password: string): Action => ({ type: LOGIN_REQUEST })
@@ -20,7 +21,7 @@ export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS';
 export type LOGOUT_SUCCESS = { isFetching: boolean, isAuthenticated: boolean };
 export const receiveLogout = (): Action<LOGOUT_SUCCESS> => ({ type: LOGOUT_SUCCESS })
 
-export function registerUser(username: string, password: string) {
+export function registerUser(username: string, password: string, history: History) {
     return (dispatch: (action: any) => void) => {
         dispatch(requestLogin(username, password));
 
@@ -30,6 +31,8 @@ export function registerUser(username: string, password: string) {
                 if (result.response.ok) {
                     DataService.getLoggedInUser().then(response => {
                         dispatch(receiveLogin(response.content.user));
+                        if (history.location.pathname === '/')
+                            history.push('/dashboard');
                     })
                 } else {
                     dispatch(loginError());
@@ -39,7 +42,7 @@ export function registerUser(username: string, password: string) {
     };
 }
 
-export function loginUser(username: string, password: string) {
+export function loginUser(username: string, password: string, history: History) {
     return (dispatch: (action: any) => void) => {
         dispatch(requestLogin(username, password));
 
@@ -47,6 +50,8 @@ export function loginUser(username: string, password: string) {
             if (result.response.ok) {
                 DataService.getLoggedInUser().then(response => {
                     dispatch(receiveLogin(response.content.user));
+                    if (history.location.pathname === '/')
+                        history.push('/dashboard');
                 })
             } else {
                 dispatch(loginError());

@@ -22,8 +22,8 @@ export default class Invoices extends Component<IProps> {
                 <table className="table">
                     <thead>
                         <tr>
-                            <th>Jaar</th>
-                            <th>Maand</th>
+                            <th style={{width: "70px"}}>Jaar</th>
+                            <th style={{width: "70px"}}>Maand</th>
                             <th>Bestemmeling</th>
                             <th>Bedrag</th>
                             <th>Status</th>
@@ -34,18 +34,18 @@ export default class Invoices extends Component<IProps> {
                         { props.invoices.map(invoiceYear =>
                             <React.Fragment key={`year_${invoiceYear.year}`}>
                                 <tr>
-                                    <td>{invoiceYear.year}</td>
+                                    <td><b>{invoiceYear.year}</b></td>
                                     <td></td>
-                                    <td>Totaal</td>
-                                    <td>{invoiceYear.months.map(x => x.invoices.map(i => i.total).reduce((a, b) => a + b, 0)).reduce((a, b) => a + b, 0).toFixed(2)}</td>
+                                    <td><b>Totaal</b></td>
+                                    <td><b>{invoiceYear.months.map(x => x.invoices.map(i => i.total).reduce((a, b) => a + b, 0)).reduce((a, b) => a + b, 0).toFixed(2)}</b></td>
                                 </tr>
                                 { invoiceYear.months.map(invoiceMonth =>
                                     <React.Fragment key={`month_${invoiceYear.year}_${invoiceMonth.month}`}>
                                         <tr>
                                             <td></td>
-                                            <td>{invoiceMonth.month}</td>
-                                            <td>Totaal</td>
-                                            <td>{invoiceMonth.invoices.map(x => x.total).reduce((a, b) => a + b, 0).toFixed(2)}</td>
+                                            <td><b>{invoiceMonth.month}</b></td>
+                                            <td><b>Totaal</b></td>
+                                            <td><b>{invoiceMonth.invoices.map(x => x.total).reduce((a, b) => a + b, 0).toFixed(2)}</b></td>
                                         </tr>
                                         {...invoiceMonth.invoices.map(x => 
                                             <tr key={x.id}>

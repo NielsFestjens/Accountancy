@@ -15,6 +15,18 @@ const initialState: State = {
     invoiceYears: []
 }
 
+function groupByYearAndMonth(invoices: InvoiceDto[]) {
+    return groupBy(invoices, x => x.year)
+    .map(x => ({
+        year: x.key,
+        months: groupBy(x.items, x => x.month)
+            .map(x => ({ 
+                month: x.key, 
+                invoices: x.items
+            }))
+    }));
+}
+
 export default function reducers(oldState = initialState, action: any) {
     switch (action.type) {
 
@@ -23,21 +35,14 @@ export default function reducers(oldState = initialState, action: any) {
             return newState(oldState, state => {
                 data.invoices.forEach(invoice => invoice.link = `${apiUri}Invoices/PrintPdf?id=${invoice.id}`);
                 state.invoices = data.invoices;
-                state.invoiceYears = groupBy(data.invoices, x => x.year)
-                    .map(x => ({
-                        year: x.key,
-                        months: groupBy(x.items, x => x.month)
-                            .map(x => ({ 
-                                month: x.key, 
-                                invoices: x.items
-                            }))
-                    }));
+                state.invoiceYears = groupByYearAndMonth(state.invoices);
             });
         }
         case actions.DASHBOARD_UPDATED_INVOICE_STATUS: {
             const data = action.payload as actions.DASHBOARD_UPDATED_INVOICE_STATUS;
             return newState(oldState, state => {
                 state.invoices.filter(x => x.id === data.invoice.id)[0].status = data.status;
+                state.invoiceYears = groupByYearAndMonth(state.invoices);
             });
         }
         default:

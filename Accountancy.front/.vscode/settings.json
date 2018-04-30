@@ -1,2 +1,9 @@
 {
+    "files.exclude": {
+        ".idea": true,
+        ".vscode": true,
+        "build": true,
+        "dist": true
+    },
+    "explorer.openEditors.visible": 0
 }

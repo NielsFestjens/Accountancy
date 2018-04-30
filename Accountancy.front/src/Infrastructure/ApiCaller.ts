@@ -50,7 +50,7 @@ export default class ApiCaller {
         if (response.ok)
             return { response, content: undefined as any };
 
-        if (response.status === 500)
+        if (response.status == 400 || response.status === 500)
             return response.json().then(content => ({ response, content }));
         
         dispatch(notifications.addError('Er is iets misgegaan tijdens het uitvoeren van een opdracht op de server'));

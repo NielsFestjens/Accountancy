@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Accountancy.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20171209133512_InsertInvoices")]
+    [Migration("20171209133514_InsertInvoices")]
     public class InsertInvoices : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -107,10 +107,11 @@ namespace Accountancy.Migrations
 
                 CreateInvoice(1, qframe, 2018, 01, InvoiceStatus.Paid,  1.51m, null);
                 CreateInvoice(2, cronos, 2018, 01, InvoiceStatus.Paid, 25.20m, null);
-                CreateInvoice(3, qframe, 2018, 02, InvoiceStatus.Sent,  0.25m, null);
-                CreateInvoice(4, cronos, 2018, 02, InvoiceStatus.Sent, 24.38m, "CRO18/0257/0001");
-                CreateInvoice(5, qframe, 2018, 03, InvoiceStatus.Sent,  0.38m, null);
-                CreateInvoice(6, cronos, 2018, 03, InvoiceStatus.Sent, 28.13m, "CRO18/0257/0001");
+                CreateInvoice(3, qframe, 2018, 02, InvoiceStatus.Paid,  0.25m, null);
+                CreateInvoice(4, cronos, 2018, 02, InvoiceStatus.Paid, 24.38m, "CRO18/0257/0001");
+                CreateInvoice(5, qframe, 2018, 03, InvoiceStatus.Paid,  0.38m, null);
+                CreateInvoice(6, cronos, 2018, 03, InvoiceStatus.Paid, 28.13m, "CRO18/0257/0001");
+                CreateInvoice(7, cronos, 2018, 04, InvoiceStatus.Sent, 26.06m, "CRO18/0257/0001");
 
                 context.SaveChanges();
             }

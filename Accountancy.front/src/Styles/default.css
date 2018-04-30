@@ -25,3 +25,11 @@ body {
 .action-icon {
     margin: 5px;
 }
+
+.table td {
+    padding: 2px;
+}
+
+.table th {
+    padding: 2px;
+}
