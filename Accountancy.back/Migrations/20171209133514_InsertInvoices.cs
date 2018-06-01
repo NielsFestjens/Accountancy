@@ -111,7 +111,9 @@ namespace Accountancy.Migrations
                 CreateInvoice(4, cronos, 2018, 02, InvoiceStatus.Paid, 24.38m, "CRO18/0257/0001");
                 CreateInvoice(5, qframe, 2018, 03, InvoiceStatus.Paid,  0.38m, null);
                 CreateInvoice(6, cronos, 2018, 03, InvoiceStatus.Paid, 28.13m, "CRO18/0257/0001");
-                CreateInvoice(7, cronos, 2018, 04, InvoiceStatus.Sent, 26.06m, "CRO18/0257/0001");
+                CreateInvoice(7, cronos, 2018, 04, InvoiceStatus.Paid, 26.06m, "CRO18/0257/0001");
+                CreateInvoice(8, qframe, 2018, 05, InvoiceStatus.Sent, 0.94m, null);
+                CreateInvoice(9, cronos, 2018, 05, InvoiceStatus.Sent, 19.44m, "CRO18/0257/0001");
 
                 context.SaveChanges();
             }
