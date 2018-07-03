@@ -68,12 +68,14 @@ namespace Accountancy.Migrations
                 context.Add(cronos);
                 context.SaveChanges();
 
-                void CreateInvoice(int number, Company receiver, int year, int month, InvoiceStatus status, decimal? amount, string theirReference)
+                int factuurNr;
+
+                void CreateInvoice(Company receiver, int year, int month, InvoiceStatus status, decimal? amount, string theirReference)
                 {
                     var date = new DateTime(year, month, DateTime.DaysInMonth(year, month));
                     context.Add(new Invoice
                     {
-                        Number = number,
+                        Number = ++factuurNr,
                         IssuingCompany = nfSoftware,
                         ReceivingCompany = receiver,
                         Year = year,
@@ -98,22 +100,24 @@ namespace Accountancy.Migrations
                     context.SaveChanges();
                 }
 
-                CreateInvoice(1, qframe, 2017, 10, InvoiceStatus.Paid,  2.78m, null);
-                CreateInvoice(2, cronos, 2017, 10, InvoiceStatus.Paid, 17.94m, null);
-                CreateInvoice(3, qframe, 2017, 11, InvoiceStatus.Paid,  1.53m, null);
-                CreateInvoice(4, cronos, 2017, 11, InvoiceStatus.Paid, 20.28m, null);
-                CreateInvoice(5, qframe, 2017, 12, InvoiceStatus.Paid,  1.13m, null);
-                CreateInvoice(6, cronos, 2017, 12, InvoiceStatus.Paid, 22.44m, null);
+                factuurNr = 0;
+                CreateInvoice(qframe, 2017, 10, InvoiceStatus.Paid,  2.78m, null);
+                CreateInvoice(cronos, 2017, 10, InvoiceStatus.Paid, 17.94m, null);
+                CreateInvoice(qframe, 2017, 11, InvoiceStatus.Paid,  1.53m, null);
+                CreateInvoice(cronos, 2017, 11, InvoiceStatus.Paid, 20.28m, null);
+                CreateInvoice(qframe, 2017, 12, InvoiceStatus.Paid,  1.13m, null);
+                CreateInvoice(cronos, 2017, 12, InvoiceStatus.Paid, 22.44m, null);
 
-                CreateInvoice(1, qframe, 2018, 01, InvoiceStatus.Paid,  1.51m, null);
-                CreateInvoice(2, cronos, 2018, 01, InvoiceStatus.Paid, 25.20m, null);
-                CreateInvoice(3, qframe, 2018, 02, InvoiceStatus.Paid,  0.25m, null);
-                CreateInvoice(4, cronos, 2018, 02, InvoiceStatus.Paid, 24.38m, "CRO18/0257/0001");
-                CreateInvoice(5, qframe, 2018, 03, InvoiceStatus.Paid,  0.38m, null);
-                CreateInvoice(6, cronos, 2018, 03, InvoiceStatus.Paid, 28.13m, "CRO18/0257/0001");
-                CreateInvoice(7, cronos, 2018, 04, InvoiceStatus.Paid, 26.06m, "CRO18/0257/0001");
-                CreateInvoice(8, qframe, 2018, 05, InvoiceStatus.Sent, 0.94m, null);
-                CreateInvoice(9, cronos, 2018, 05, InvoiceStatus.Sent, 19.44m, "CRO18/0257/0001");
+                factuurNr = 0;
+                CreateInvoice(qframe, 2018, 01, InvoiceStatus.Paid,  1.51m, null);
+                CreateInvoice(cronos, 2018, 01, InvoiceStatus.Paid, 25.20m, null);
+                CreateInvoice(qframe, 2018, 02, InvoiceStatus.Paid,  0.25m, null);
+                CreateInvoice(cronos, 2018, 02, InvoiceStatus.Paid, 24.38m, "CRO18/0257/0001");
+                CreateInvoice(qframe, 2018, 03, InvoiceStatus.Paid,  0.38m, null);
+                CreateInvoice(cronos, 2018, 03, InvoiceStatus.Paid, 28.13m, "CRO18/0257/0001");
+                CreateInvoice(cronos, 2018, 04, InvoiceStatus.Paid, 26.06m, "CRO18/0257/0001");
+                CreateInvoice(qframe, 2018, 06, InvoiceStatus.Sent,  1.50m, null);
+                CreateInvoice(cronos, 2018, 06, InvoiceStatus.Sent, 19.50m, "CRO18/0257/0001");
 
                 context.SaveChanges();
             }
