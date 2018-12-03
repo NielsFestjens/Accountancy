@@ -100,10 +100,10 @@ namespace Accountancy.Migrations
                     context.SaveChanges();
                 }
 
-                void CreateInvoices(int year, int month, decimal? amoutQframe, decimal amountCronos, string referenceCronos = null)
+                void CreateInvoices(int year, int month, decimal? amountQframe, decimal amountCronos, string referenceCronos = null)
                 {
-                    if (amoutQframe.HasValue)
-                        CreateInvoice(qframe, year, month, InvoiceStatus.Sent, amoutQframe, null);
+                    if (amountQframe.HasValue)
+                        CreateInvoice(qframe, year, month, InvoiceStatus.Sent, amountQframe, null);
 
                     CreateInvoice(cronos, year, month, InvoiceStatus.Sent, amountCronos, referenceCronos);
                 }
@@ -122,6 +122,9 @@ namespace Accountancy.Migrations
                 CreateInvoices(2018, 06, 1.50m, 19.50m, "CRO18/0257/0001");
                 CreateInvoices(2018, 07, 1.13m, 17.69m, "CRO18/0257/0001");
                 CreateInvoices(2018, 08, 0.75m, 11.94m, "CRO18/0257/0001");
+                CreateInvoices(2018, 09, 2.38m, 18.56m, "CRO18/0257/0001");
+                CreateInvoices(2018, 10, 2.58m, 23.09m, "CRO18/0257/0001");
+                CreateInvoices(2018, 11, 1.50m, 19.75m, "CRO18/0257/0001");
 
                 context.SaveChanges();
             }
