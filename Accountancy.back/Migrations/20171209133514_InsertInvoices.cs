@@ -125,6 +125,9 @@ namespace Accountancy.Migrations
                 CreateInvoices(2018, 09, 2.38m, 18.56m, "CRO18/0257/0001");
                 CreateInvoices(2018, 10, 2.58m, 23.09m, "CRO18/0257/0001");
                 CreateInvoices(2018, 11, 1.50m, 19.75m, "CRO18/0257/0001");
+                CreateInvoices(2018, 12, 0.56m, 19.44m, "CRO18/0257/0001");
+
+                factuurNr = 0;
 
                 context.SaveChanges();
             }
