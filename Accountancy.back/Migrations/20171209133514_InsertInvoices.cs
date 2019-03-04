@@ -11,126 +11,184 @@ namespace Accountancy.Migrations
     [Migration("20171209133514_InsertInvoices")]
     public class InsertInvoices : Migration
     {
-        protected override void Up(MigrationBuilder migrationBuilder)
+        private class InvoiceInserter
         {
-            using (var context = DatabaseContextFacory.Create())
+            private readonly DatabaseContext _context;
+            private readonly Company _nfSoftware;
+            private readonly Company _qframe;
+            private readonly Company _cronos;
+
+            private decimal _dagprijs;
+            private int _jaar;
+            private int _maand;
+            private int _factuurNr;
+
+            public InvoiceInserter(DatabaseContext context, Company nfSoftware, Company qframe, Company cronos)
             {
-                var niels = new Person
-                {
-                    FirstName = "Niels",
-                    LastName = "Festjens",
-                    Email = "festjens_niels@hotmail.com",
-                    Phone = "+32 477 / 60 39 05"
-                };
-                context.Add(niels);
+                _context = context;
+                _nfSoftware = nfSoftware;
+                _qframe = qframe;
+                _cronos = cronos;
+            }
 
-                var danny = new Person
-                {
-                    FirstName = "Danny",
-                    LastName = "Gladines",
-                    Email = "danny.gladines@qframe.be"
-                };
-                context.Add(danny);
+            public void StartJaar(decimal newDagprijs, int newJaar, int newMaand = 1)
+            {
+                _dagprijs = newDagprijs;
+                _jaar = newJaar;
+                _maand = newMaand;
+                _factuurNr = 0;
+            }
 
-                var nfSoftware = new Company
+            public void CreateInvoice(Company receiver, InvoiceStatus status, decimal? amount, string theirReference)
+            {
+                var date = new DateTime(_jaar, _maand, DateTime.DaysInMonth(_jaar, _maand));
+                _context.Add(new Invoice
                 {
-                    ContactPerson = niels,
-                    Name = "N.F. Software",
-                    FullName = "N.F. Software Comm.V",
-                    AddressLine = "Hollebeekstraat 5 bus 3",
-                    CityLine = "2840 Rumst",
-                    VAT = "BE 0681.952.956",
-                    BankAccount = "BE75 7360 4179 6051"
-                };
-                context.Add(nfSoftware);
-
-                var qframe = new Company
-                {
-                    ContactPerson = danny,
-                    Name = "Qframe",
-                    FullName = "Qframe NV",
-                    AddressLine = "Veldkant 33A",
-                    CityLine = "2550 Kontich",
-                    VAT = "BE 0887.377.180",
-                    Recipients = "karina.vereecken@qframe.be"
-                };
-                context.Add(qframe);
-
-                var cronos = new Company
-                {
-                    Name = "Cronos",
-                    FullName = "Cronos NV",
-                    AddressLine = "Veldkant 35D",
-                    CityLine = "2550 Kontich",
-                    VAT = "BE 0443.807.959",
-                    Recipients = "daria.wycislo@cronos.be; heidi.lens@cronos.be; karina.vereecken@qframe.be"
-                };
-                context.Add(cronos);
-                context.SaveChanges();
-
-                int factuurNr;
-
-                void CreateInvoice(Company receiver, int year, int month, InvoiceStatus status, decimal? amount, string theirReference)
-                {
-                    var date = new DateTime(year, month, DateTime.DaysInMonth(year, month));
-                    context.Add(new Invoice
-                    {
-                        Number = ++factuurNr,
-                        IssuingCompany = nfSoftware,
-                        ReceivingCompany = receiver,
-                        Year = year,
-                        Month = month,
-                        Date = date,
-                        ExpiryPeriodDays = 30,
-                        Status = status,
-                        TheirReference = theirReference,
-                        InvoiceLines = amount == null
-                            ? new List<InvoiceLine>()
-                            : new List<InvoiceLine>
-                            {
+                    Number = ++_factuurNr,
+                    IssuingCompany = _nfSoftware,
+                    ReceivingCompany = receiver,
+                    Year = _jaar,
+                    Month = _maand,
+                    Date = date,
+                    ExpiryPeriodDays = 30,
+                    Status = status,
+                    TheirReference = theirReference,
+                    InvoiceLines = amount == null
+                        ? new List<InvoiceLine>()
+                        : new List<InvoiceLine>
+                        {
                                 new InvoiceLine
                                 {
                                     Description = "Gepresteerde dagen",
                                     Amount = amount.Value,
-                                    Price = 520.00m,
+                                    Price = _dagprijs,
                                     VatType = VatType.Vat21
                                 }
-                            }
-                    });
-                    context.SaveChanges();
-                }
+                        }
+                });
+                _context.SaveChanges();
+            }
 
-                void CreateInvoices(int year, int month, decimal? amountQframe, decimal amountCronos, string referenceCronos = null)
-                {
-                    if (amountQframe.HasValue)
-                        CreateInvoice(qframe, year, month, InvoiceStatus.Sent, amountQframe, null);
+            public void CreateInvoices(decimal? amountQframe, decimal? amountCronos = null, string referenceCronos = null)
+            {
+                if (amountQframe.HasValue)
+                    CreateInvoice(_qframe, InvoiceStatus.Sent, amountQframe, null);
 
-                    CreateInvoice(cronos, year, month, InvoiceStatus.Sent, amountCronos, referenceCronos);
-                }
+                if (amountCronos.HasValue)
+                    CreateInvoice(_cronos, InvoiceStatus.Sent, amountCronos, referenceCronos);
 
-                factuurNr = 0;
-                CreateInvoices(2017, 10, 2.78m, 17.94m);
-                CreateInvoices(2017, 11, 1.53m, 20.28m);
-                CreateInvoices(2017, 12, 1.13m, 22.44m);
+                _maand++;
+            }
+        }
 
-                factuurNr = 0;
-                CreateInvoices(2018, 01, 1.51m, 25.20m);
-                CreateInvoices(2018, 02, 0.25m, 24.38m, "CRO18/0257/0001");
-                CreateInvoices(2018, 03, 0.38m, 28.13m, "CRO18/0257/0001");
-                CreateInvoices(2018, 04,  null, 26.06m, "CRO18/0257/0001");
-                CreateInvoices(2018, 05, 0.94m, 19.44m, "CRO18/0257/0001");
-                CreateInvoices(2018, 06, 1.50m, 19.50m, "CRO18/0257/0001");
-                CreateInvoices(2018, 07, 1.13m, 17.69m, "CRO18/0257/0001");
-                CreateInvoices(2018, 08, 0.75m, 11.94m, "CRO18/0257/0001");
-                CreateInvoices(2018, 09, 2.38m, 18.56m, "CRO18/0257/0001");
-                CreateInvoices(2018, 10, 2.58m, 23.09m, "CRO18/0257/0001");
-                CreateInvoices(2018, 11, 1.50m, 19.75m, "CRO18/0257/0001");
-                CreateInvoices(2018, 12, 0.56m, 19.44m, "CRO18/0257/0001");
-
-                factuurNr = 0;
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            using (var context = DatabaseContextFacory.Create())
+            {
+                var nfSoftware = InsertNfSoftware(context);
+                var qframe = InsertQframe(context);
+                var cronos = InsertCronos(context);
 
                 context.SaveChanges();
+
+                InsertAllInvoices(context, nfSoftware, qframe, cronos);
             }
+        }
+
+        private static Company InsertCronos(DatabaseContext context)
+        {
+            var cronos = new Company
+            {
+                Name = "Cronos",
+                FullName = "Cronos NV",
+                AddressLine = "Veldkant 35D",
+                CityLine = "2550 Kontich",
+                VAT = "BE 0443.807.959",
+                Recipients = "daria.wycislo@cronos.be; heidi.lens@cronos.be; karina.vereecken@qframe.be"
+            };
+            context.Add(cronos);
+            return cronos;
+        }
+
+        private static Company InsertQframe(DatabaseContext context)
+        {
+            var contactPerson = new Person
+            {
+                FirstName = "Danny",
+                LastName = "Gladines",
+                Email = "danny.gladines@qframe.be"
+            };
+            context.Add(contactPerson);
+
+            var qframe = new Company
+            {
+                ContactPerson = contactPerson,
+                Name = "Qframe",
+                FullName = "Qframe NV",
+                AddressLine = "Veldkant 33A",
+                CityLine = "2550 Kontich",
+                VAT = "BE 0887.377.180",
+                Recipients = "karina.vereecken@qframe.be"
+            };
+            context.Add(qframe);
+
+            return qframe;
+        }
+
+        private static Company InsertNfSoftware(DatabaseContext context)
+        {
+            var contactPerson = new Person
+            {
+                FirstName = "Niels",
+                LastName = "Festjens",
+                Email = "festjens_niels@hotmail.com",
+                Phone = "+32 477 / 60 39 05"
+            };
+            context.Add(contactPerson);
+
+            var nfSoftware = new Company
+            {
+                ContactPerson = contactPerson,
+                Name = "N.F. Software",
+                FullName = "N.F. Software Comm.V",
+                AddressLine = "Hollebeekstraat 5 bus 3",
+                CityLine = "2840 Rumst",
+                VAT = "BE 0681.952.956",
+                BankAccount = "BE75 7360 4179 6051"
+            };
+            context.Add(nfSoftware);
+
+            return nfSoftware;
+        }
+
+        private static void InsertAllInvoices(DatabaseContext context, Company nfSoftware, Company qframe, Company cronos)
+        {
+            var invoiceInserter = new InvoiceInserter(context, nfSoftware, qframe, cronos);
+
+            invoiceInserter.StartJaar(520.00m, 2017, 10);
+            invoiceInserter.CreateInvoices(2.78m, 17.94m);
+            invoiceInserter.CreateInvoices(1.53m, 20.28m);
+            invoiceInserter.CreateInvoices(1.13m, 22.44m);
+
+            invoiceInserter.StartJaar(520.00m, 2018);
+            invoiceInserter.CreateInvoices(1.51m, 25.20m);
+            invoiceInserter.CreateInvoices(0.25m, 24.38m, "CRO18/0257/0001");
+            invoiceInserter.CreateInvoices(0.38m, 28.13m, "CRO18/0257/0001");
+            invoiceInserter.CreateInvoices(null, 26.06m, "CRO18/0257/0001");
+            invoiceInserter.CreateInvoices(0.94m, 19.44m, "CRO18/0257/0001");
+            invoiceInserter.CreateInvoices(1.50m, 19.50m, "CRO18/0257/0001");
+            invoiceInserter.CreateInvoices(1.13m, 17.69m, "CRO18/0257/0001");
+            invoiceInserter.CreateInvoices(0.75m, 11.94m, "CRO18/0257/0001");
+            invoiceInserter.CreateInvoices(2.38m, 18.56m, "CRO18/0257/0001");
+            invoiceInserter.CreateInvoices(2.58m, 23.09m, "CRO18/0257/0001");
+            invoiceInserter.CreateInvoices(1.50m, 19.75m, "CRO18/0257/0001");
+            invoiceInserter.CreateInvoices(0.56m, 19.44m, "CRO18/0257/0001");
+
+            invoiceInserter.StartJaar(540.00m, 2019);
+            invoiceInserter.CreateInvoices(22.38m);
+            invoiceInserter.CreateInvoices(18m);
+
+            context.SaveChanges();
         }
     }
 }
