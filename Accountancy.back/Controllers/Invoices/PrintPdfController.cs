@@ -35,7 +35,7 @@ namespace Accountancy.Controllers.Invoices
 
             var stream = _invoicePdfCreator.Generate(invoice);
             
-            Response.Headers.Add("Content-Disposition", $"inline; filename={invoice.Year}-{invoice.Month} - Factuur van {invoice.IssuingCompany.FullName} voor {invoice.ReceivingCompany.FullName}.pdf");
+            Response.Headers.Add("Content-Disposition", $"inline; filename={invoice.Year}-{invoice.Month:00} - Factuur van {invoice.IssuingCompany.FullName} voor {invoice.ReceivingCompany.FullName}.pdf");
             return new FileContentResult(stream.ToArray(), "application/pdf");
         }
     }

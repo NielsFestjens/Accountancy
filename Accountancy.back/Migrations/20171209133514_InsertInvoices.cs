@@ -174,7 +174,7 @@ namespace Accountancy.Migrations
             invoiceInserter.CreateInvoices(1.51m, 25.20m);
             invoiceInserter.CreateInvoices(0.25m, 24.38m, "CRO18/0257/0001");
             invoiceInserter.CreateInvoices(0.38m, 28.13m, "CRO18/0257/0001");
-            invoiceInserter.CreateInvoices(null, 26.06m, "CRO18/0257/0001");
+            invoiceInserter.CreateInvoices(null , 26.06m, "CRO18/0257/0001");
             invoiceInserter.CreateInvoices(0.94m, 19.44m, "CRO18/0257/0001");
             invoiceInserter.CreateInvoices(1.50m, 19.50m, "CRO18/0257/0001");
             invoiceInserter.CreateInvoices(1.13m, 17.69m, "CRO18/0257/0001");
@@ -187,6 +187,9 @@ namespace Accountancy.Migrations
             invoiceInserter.StartJaar(540.00m, 2019);
             invoiceInserter.CreateInvoices(22.38m);
             invoiceInserter.CreateInvoices(18m);
+            invoiceInserter.CreateInvoices(21.03m);
+            invoiceInserter.CreateInvoices(15.06m);
+            invoiceInserter.CreateInvoices(16.46m);
 
             context.SaveChanges();
         }
