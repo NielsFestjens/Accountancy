@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Accountancy.Domain.Invoices;
 using Accountancy.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -39,9 +40,10 @@ namespace Accountancy.Migrations
                 _factuurNr = 0;
             }
 
-            public void CreateInvoice(Company receiver, InvoiceStatus status, decimal? amount, string theirReference)
+            public void CreateInvoice(Company receiver, InvoiceStatus status, decimal? amount, string theirReference, bool splitRoyalties)
             {
                 var date = new DateTime(_jaar, _maand, DateTime.DaysInMonth(_jaar, _maand));
+                var invoiceLines = GetInvoiceLines(amount, splitRoyalties);
                 _context.Add(new Invoice
                 {
                     Number = ++_factuurNr,
@@ -53,29 +55,33 @@ namespace Accountancy.Migrations
                     ExpiryPeriodDays = 30,
                     Status = status,
                     TheirReference = theirReference,
-                    InvoiceLines = amount == null
-                        ? new List<InvoiceLine>()
-                        : new List<InvoiceLine>
-                        {
-                                new InvoiceLine
-                                {
-                                    Description = "Gepresteerde dagen",
-                                    Amount = amount.Value,
-                                    Price = _dagprijs,
-                                    VatType = VatType.Vat21
-                                }
-                        }
+                    InvoiceLines = GetInvoiceLines(amount, splitRoyalties).ToList()
                 });
                 _context.SaveChanges();
             }
 
-            public void CreateInvoices(decimal? amountQframe, decimal? amountCronos = null, string referenceCronos = null)
+            private IEnumerable<InvoiceLine> GetInvoiceLines(decimal? amount, bool splitRoyalties)
+            {
+                if (amount == null)
+                    yield break;
+
+                if (!splitRoyalties)
+                {
+                    yield return new InvoiceLine("Gepresteerde dagen", amount.Value, _dagprijs);
+                    yield break;
+                }
+
+                yield return new InvoiceLine("Gepresteerde dagen", amount.Value, _dagprijs * 3 / 4);
+                yield return new InvoiceLine("Vergoeding overdracht auteursrechten", amount.Value, _dagprijs / 4);
+            }
+
+            public void CreateInvoices(decimal? amountQframe, decimal? amountCronos = null, string referenceCronos = null, bool splitRoyalties = false)
             {
                 if (amountQframe.HasValue)
-                    CreateInvoice(_qframe, InvoiceStatus.Sent, amountQframe, null);
+                    CreateInvoice(_qframe, InvoiceStatus.Sent, amountQframe, null, splitRoyalties);
 
                 if (amountCronos.HasValue)
-                    CreateInvoice(_cronos, InvoiceStatus.Sent, amountCronos, referenceCronos);
+                    CreateInvoice(_cronos, InvoiceStatus.Sent, amountCronos, referenceCronos, splitRoyalties);
 
                 _maand++;
             }
@@ -190,6 +196,8 @@ namespace Accountancy.Migrations
             invoiceInserter.CreateInvoices(21.03m);
             invoiceInserter.CreateInvoices(15.06m);
             invoiceInserter.CreateInvoices(16.46m);
+            invoiceInserter.CreateInvoices(17.15m);
+            invoiceInserter.CreateInvoices(17.81m, splitRoyalties: true);
 
             context.SaveChanges();
         }

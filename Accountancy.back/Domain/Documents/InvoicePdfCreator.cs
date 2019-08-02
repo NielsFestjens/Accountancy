@@ -115,7 +115,7 @@ namespace Accountancy.Controllers.Documents
 
         private static IElement GetHeaderPart(Invoice invoice)
         {
-            return new Paragraph(new Phrase(invoice.IssuingCompany.Name, PdfHelper.TitleFont));
+            return new Paragraph(new Phrase("Factuur van " + invoice.IssuingCompany.Name, PdfHelper.TitleFont));
         }
 
         private static IElement GetCompaniesPart(Invoice invoice)
