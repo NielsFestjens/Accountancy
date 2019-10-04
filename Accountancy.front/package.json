@@ -34,7 +34,7 @@
     "bootstrap": "^4.0.0-beta.2",
     "css-loader": "^0.28.7",
     "font-awesome": "^4.7.0",
-    "jquery": "^3.0.0",
+    "jquery": "^3.4.0",
     "popper.js": "^1.12.9",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
