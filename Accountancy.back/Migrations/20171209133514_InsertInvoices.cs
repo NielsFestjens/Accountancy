@@ -43,7 +43,6 @@ namespace Accountancy.Migrations
             public void CreateInvoice(Company receiver, InvoiceStatus status, decimal? amount, string theirReference, bool splitRoyalties)
             {
                 var date = new DateTime(_jaar, _maand, DateTime.DaysInMonth(_jaar, _maand));
-                var invoiceLines = GetInvoiceLines(amount, splitRoyalties);
                 _context.Add(new Invoice
                 {
                     Number = ++_factuurNr,
@@ -198,6 +197,8 @@ namespace Accountancy.Migrations
             invoiceInserter.CreateInvoices(16.46m);
             invoiceInserter.CreateInvoices(17.15m);
             invoiceInserter.CreateInvoices(17.81m, splitRoyalties: true);
+            invoiceInserter.CreateInvoices(16.08m, splitRoyalties: true);
+            invoiceInserter.CreateInvoices(21.03m, splitRoyalties: true);
 
             context.SaveChanges();
         }
