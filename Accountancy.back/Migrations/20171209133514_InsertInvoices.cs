@@ -199,6 +199,9 @@ namespace Accountancy.Migrations
             invoiceInserter.CreateInvoices(17.81m, splitRoyalties: true);
             invoiceInserter.CreateInvoices(16.08m, splitRoyalties: true);
             invoiceInserter.CreateInvoices(21.03m, splitRoyalties: true);
+            invoiceInserter.CreateInvoices(21.00m, splitRoyalties: true);
+            invoiceInserter.CreateInvoices(19.00m, splitRoyalties: true);
+            invoiceInserter.CreateInvoices(19.44m, splitRoyalties: true);
 
             context.SaveChanges();
         }
