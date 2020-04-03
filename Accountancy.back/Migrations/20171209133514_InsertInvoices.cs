@@ -24,6 +24,9 @@ namespace Accountancy.Migrations
             private int _maand;
             private int _factuurNr;
 
+            public string ReferenceCronos { get; set; }
+            public bool SplitRoyalties { get; set; }
+
             public InvoiceInserter(DatabaseContext context, Company nfSoftware, Company qframe, Company cronos)
             {
                 _context = context;
@@ -40,7 +43,7 @@ namespace Accountancy.Migrations
                 _factuurNr = 0;
             }
 
-            public void CreateInvoice(Company receiver, InvoiceStatus status, decimal? amount, string theirReference, bool splitRoyalties)
+            private void CreateInvoice(Company receiver, InvoiceStatus status, decimal? amount, string theirReference)
             {
                 var date = new DateTime(_jaar, _maand, DateTime.DaysInMonth(_jaar, _maand));
                 _context.Add(new Invoice
@@ -54,17 +57,17 @@ namespace Accountancy.Migrations
                     ExpiryPeriodDays = 30,
                     Status = status,
                     TheirReference = theirReference,
-                    InvoiceLines = GetInvoiceLines(amount, splitRoyalties).ToList()
+                    InvoiceLines = GetInvoiceLines(amount).ToList()
                 });
                 _context.SaveChanges();
             }
 
-            private IEnumerable<InvoiceLine> GetInvoiceLines(decimal? amount, bool splitRoyalties)
+            private IEnumerable<InvoiceLine> GetInvoiceLines(decimal? amount)
             {
                 if (amount == null)
                     yield break;
 
-                if (!splitRoyalties)
+                if (!SplitRoyalties)
                 {
                     yield return new InvoiceLine("Gepresteerde dagen", amount.Value, _dagprijs);
                     yield break;
@@ -74,13 +77,13 @@ namespace Accountancy.Migrations
                 yield return new InvoiceLine("Vergoeding overdracht auteursrechten", amount.Value, _dagprijs / 4);
             }
 
-            public void CreateInvoices(decimal? amountQframe, decimal? amountCronos = null, string referenceCronos = null, bool splitRoyalties = false)
+            public void CreateInvoices(decimal? amountQframe, decimal? amountCronos = null)
             {
                 if (amountQframe.HasValue)
-                    CreateInvoice(_qframe, InvoiceStatus.Sent, amountQframe, null, splitRoyalties);
+                    CreateInvoice(_qframe, InvoiceStatus.Sent, amountQframe, null);
 
                 if (amountCronos.HasValue)
-                    CreateInvoice(_cronos, InvoiceStatus.Sent, amountCronos, referenceCronos, splitRoyalties);
+                    CreateInvoice(_cronos, InvoiceStatus.Sent, amountCronos, ReferenceCronos);
 
                 _maand++;
             }
@@ -177,31 +180,38 @@ namespace Accountancy.Migrations
 
             invoiceInserter.StartJaar(520.00m, 2018);
             invoiceInserter.CreateInvoices(1.51m, 25.20m);
-            invoiceInserter.CreateInvoices(0.25m, 24.38m, "CRO18/0257/0001");
-            invoiceInserter.CreateInvoices(0.38m, 28.13m, "CRO18/0257/0001");
-            invoiceInserter.CreateInvoices(null , 26.06m, "CRO18/0257/0001");
-            invoiceInserter.CreateInvoices(0.94m, 19.44m, "CRO18/0257/0001");
-            invoiceInserter.CreateInvoices(1.50m, 19.50m, "CRO18/0257/0001");
-            invoiceInserter.CreateInvoices(1.13m, 17.69m, "CRO18/0257/0001");
-            invoiceInserter.CreateInvoices(0.75m, 11.94m, "CRO18/0257/0001");
-            invoiceInserter.CreateInvoices(2.38m, 18.56m, "CRO18/0257/0001");
-            invoiceInserter.CreateInvoices(2.58m, 23.09m, "CRO18/0257/0001");
-            invoiceInserter.CreateInvoices(1.50m, 19.75m, "CRO18/0257/0001");
-            invoiceInserter.CreateInvoices(0.56m, 19.44m, "CRO18/0257/0001");
+            invoiceInserter.ReferenceCronos = "CRO18/0257/0001";
+            invoiceInserter.CreateInvoices(0.25m, 24.38m);
+            invoiceInserter.CreateInvoices(0.38m, 28.13m);
+            invoiceInserter.CreateInvoices(null , 26.06m);
+            invoiceInserter.CreateInvoices(0.94m, 19.44m);
+            invoiceInserter.CreateInvoices(1.50m, 19.50m);
+            invoiceInserter.CreateInvoices(1.13m, 17.69m);
+            invoiceInserter.CreateInvoices(0.75m, 11.94m);
+            invoiceInserter.CreateInvoices(2.38m, 18.56m);
+            invoiceInserter.CreateInvoices(2.58m, 23.09m);
+            invoiceInserter.CreateInvoices(1.50m, 19.75m);
+            invoiceInserter.CreateInvoices(0.56m, 19.44m);
 
             invoiceInserter.StartJaar(540.00m, 2019);
             invoiceInserter.CreateInvoices(22.38m);
-            invoiceInserter.CreateInvoices(18m);
+            invoiceInserter.CreateInvoices(18.00m);
             invoiceInserter.CreateInvoices(21.03m);
             invoiceInserter.CreateInvoices(15.06m);
             invoiceInserter.CreateInvoices(16.46m);
             invoiceInserter.CreateInvoices(17.15m);
-            invoiceInserter.CreateInvoices(17.81m, splitRoyalties: true);
-            invoiceInserter.CreateInvoices(16.08m, splitRoyalties: true);
-            invoiceInserter.CreateInvoices(21.03m, splitRoyalties: true);
-            invoiceInserter.CreateInvoices(21.00m, splitRoyalties: true);
-            invoiceInserter.CreateInvoices(19.00m, splitRoyalties: true);
-            invoiceInserter.CreateInvoices(19.44m, splitRoyalties: true);
+            invoiceInserter.SplitRoyalties = true;
+            invoiceInserter.CreateInvoices(17.81m);
+            invoiceInserter.CreateInvoices(16.08m);
+            invoiceInserter.CreateInvoices(21.03m);
+            invoiceInserter.CreateInvoices(21.00m);
+            invoiceInserter.CreateInvoices(19.00m);
+            invoiceInserter.CreateInvoices(19.44m);
+
+            invoiceInserter.StartJaar(540.00m, 2020);
+            invoiceInserter.CreateInvoices(20.56m);
+            invoiceInserter.CreateInvoices( 9.31m);
+            invoiceInserter.CreateInvoices(22.46m);
 
             context.SaveChanges();
         }
