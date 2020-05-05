@@ -100,6 +100,8 @@ namespace Accountancy.Migrations
                 context.SaveChanges();
 
                 InsertAllInvoices(context, nfSoftware, qframe, cronos);
+
+                context.SaveChanges();
             }
         }
 
@@ -109,8 +111,16 @@ namespace Accountancy.Migrations
             {
                 Name = "Cronos",
                 FullName = "Cronos NV",
-                AddressLine = "Veldkant 35D",
-                CityLine = "2550 Kontich",
+                Addresses = new List<CompanyAddress>
+                {
+                    new CompanyAddress
+                    {
+                        AddressLine = "Veldkant 35D",
+                        CityLine = "2550 Kontich",
+                        Start = new DateTime(2007, 02, 14),
+                        End = new DateTime(2100, 12, 31)
+                    }
+                },
                 VAT = "BE 0443.807.959",
                 Recipients = "daria.wycislo@cronos.be; heidi.lens@cronos.be; karina.vereecken@qframe.be"
             };
@@ -133,8 +143,16 @@ namespace Accountancy.Migrations
                 ContactPerson = contactPerson,
                 Name = "Qframe",
                 FullName = "Qframe NV",
-                AddressLine = "Veldkant 33A",
-                CityLine = "2550 Kontich",
+                Addresses = new List<CompanyAddress>
+                {
+                    new CompanyAddress
+                    {
+                        AddressLine = "Veldkant 33A",
+                        CityLine = "2550 Kontich",
+                        Start = new DateTime(1995, 01, 1),
+                        End = new DateTime(2100, 12, 31)
+                    }
+                },
                 VAT = "BE 0887.377.180",
                 Recipients = "karina.vereecken@qframe.be"
             };
@@ -159,8 +177,23 @@ namespace Accountancy.Migrations
                 ContactPerson = contactPerson,
                 Name = "N.F. Software",
                 FullName = "N.F. Software Comm.V",
-                AddressLine = "Hollebeekstraat 5 bus 3",
-                CityLine = "2840 Rumst",
+                Addresses = new List<CompanyAddress>
+                {
+                    new CompanyAddress
+                    {
+                        AddressLine = "Hollebeekstraat 5 bus 3",
+                        CityLine = "2840 Rumst",
+                        Start = new DateTime(2017, 10, 1),
+                        End = new DateTime(2020, 05, 1)
+                    },
+                    new CompanyAddress
+                    {
+                        AddressLine = "Heist-Goorstraat 53A bus 5",
+                        CityLine = "2220 Heist-op-den-Berg",
+                        Start = new DateTime(2020, 05, 1),
+                        End = new DateTime(2100, 12, 31)
+                    }
+                },
                 VAT = "BE 0681.952.956",
                 BankAccount = "BE75 7360 4179 6051"
             };
@@ -174,7 +207,7 @@ namespace Accountancy.Migrations
             var invoiceInserter = new InvoiceInserter(context, nfSoftware, qframe, cronos);
 
             invoiceInserter.StartJaar(520.00m, 2017, 10);
-            invoiceInserter.CreateInvoices(2.78m, 17.94m);
+            invoiceInserter.CreateInvoices(2.78m, 17.94m); 
             invoiceInserter.CreateInvoices(1.53m, 20.28m);
             invoiceInserter.CreateInvoices(1.13m, 22.44m);
 
@@ -212,8 +245,7 @@ namespace Accountancy.Migrations
             invoiceInserter.CreateInvoices(20.56m);
             invoiceInserter.CreateInvoices( 9.31m);
             invoiceInserter.CreateInvoices(22.46m);
-
-            context.SaveChanges();
+            invoiceInserter.CreateInvoices(22.03m);
         }
     }
 }

@@ -60,10 +60,10 @@ namespace Accountancy.Controllers.Documents
             table.AddCell(PdfHelper.GetCell(invoice.IssuingCompany.FullName, PdfHelper.SmallBoldFont).Pad(0).PadTop(2).BorderTop());
             table.AddCell(PdfHelper.GetCell("Adres", PdfHelper.SmallFont).Pad(0).AlignRight());
             table.AddCell(PdfHelper.GetCell("", PdfHelper.SmallBoldFont).Pad(0));
-            table.AddCell(PdfHelper.GetCell(invoice.IssuingCompany.AddressLine, PdfHelper.SmallFont).Pad(0));
+            table.AddCell(PdfHelper.GetCell(invoice.IssuingCompany.GetActiveAddress(invoice.Date.AddDays(1)).AddressLine, PdfHelper.SmallFont).Pad(0));
             table.AddCell(PdfHelper.GetCell("", PdfHelper.SmallFont).Pad(0).AlignRight());
             table.AddCell(PdfHelper.GetCell("", PdfHelper.SmallBoldFont).Pad(0));
-            table.AddCell(PdfHelper.GetCell(invoice.IssuingCompany.CityLine, PdfHelper.SmallFont).Pad(0).PadBottom());
+            table.AddCell(PdfHelper.GetCell(invoice.IssuingCompany.GetActiveAddress(invoice.Date.AddDays(1)).CityLine, PdfHelper.SmallFont).Pad(0).PadBottom());
             table.AddCell(PdfHelper.GetCell("BTW", PdfHelper.SmallFont).Pad(0).AlignRight());
             table.AddCell(PdfHelper.GetCell("", PdfHelper.SmallBoldFont).Pad(0));
             table.AddCell(PdfHelper.GetCell(invoice.IssuingCompany.VAT, PdfHelper.SmallFont).Pad(0));
@@ -123,8 +123,8 @@ namespace Accountancy.Controllers.Documents
             var table = new PdfPTable(1) { HorizontalAlignment = Element.ALIGN_LEFT, WidthPercentage = 50 };
 
             table.AddCell(PdfHelper.GetCell(invoice.ReceivingCompany.FullName, PdfHelper.LargeBoldFont));
-            table.AddCell(PdfHelper.GetCell(invoice.ReceivingCompany.AddressLine, PdfHelper.LargeFont));
-            table.AddCell(PdfHelper.GetCell(invoice.ReceivingCompany.CityLine, PdfHelper.LargeFont));
+            table.AddCell(PdfHelper.GetCell(invoice.ReceivingCompany.GetActiveAddress(invoice.Date.AddDays(1)).AddressLine, PdfHelper.LargeFont));
+            table.AddCell(PdfHelper.GetCell(invoice.ReceivingCompany.GetActiveAddress(invoice.Date.AddDays(1)).CityLine, PdfHelper.LargeFont));
             table.AddCell(PdfHelper.GetCell(invoice.ReceivingCompany.VAT, PdfHelper.LargeFont));
 
             return table;

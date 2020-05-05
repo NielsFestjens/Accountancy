@@ -17,9 +17,11 @@ namespace Accountancy.Migrations
                 context.Add(new User
                 {
                     Username = "w",
-                    Password = "n25Pg9qjde1ABd1MRr3bPK7aLsfC4xRpnwa5ha0QMvHdXggkqUaVoAfaI976smRHlDgLe2ZXcgv7eWk0bK0mzIjymtuZrN6E",
-                    PasswordSalt = "88F29ADB99ACDE84".HexToByteArray()
+                    Password = "Kouq+NI8EjQ6RAdu+CrL53BG1XEGLBJTRyyx9/CFQIIFSvCDPkYm9+fcKV3nl4t3/X5yZpb15UsCGmcPQ4fDqVs+MTgqjpJA",
+                    PasswordSalt = "5B3E31382A8E9240".HexToByteArray()
                 });
+
+                context.SaveChanges();
             }
         }
     }

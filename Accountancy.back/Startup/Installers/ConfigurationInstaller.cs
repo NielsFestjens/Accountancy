@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace Accountancy.Startup.Installers
 {
     public class ConfigurationInstaller
     {
-        public static IConfigurationRoot BuildConfiguration(IHostingEnvironment env)
+        public static IConfigurationRoot BuildConfiguration(IHostEnvironment env)
         {
             return new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)

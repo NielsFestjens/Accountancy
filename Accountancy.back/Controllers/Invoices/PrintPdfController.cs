@@ -28,8 +28,10 @@ namespace Accountancy.Controllers.Invoices
                 .Query<Invoice>()
                 .Include(x => x.IssuingCompany)
                 .Include(x => x.IssuingCompany.ContactPerson)
+                .Include(x => x.IssuingCompany.Addresses)
                 .Include(x => x.ReceivingCompany)
                 .Include(x => x.ReceivingCompany.ContactPerson)
+                .Include(x => x.ReceivingCompany.Addresses)
                 .Include(x => x.InvoiceLines)
                 .Single(x => x.Id == id);
 

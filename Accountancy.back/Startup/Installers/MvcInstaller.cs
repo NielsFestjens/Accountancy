@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Accountancy.Startup.Installers
 {
@@ -10,17 +8,16 @@ namespace Accountancy.Startup.Installers
         public static void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            services.AddMvc();
+            services.AddControllers();
         }
 
-        public static void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public static void Configure(IApplicationBuilder app)
         {
-            app.UseMvc(routes =>
+            app.UseRouting();
+            app.UseCors(builder => builder.WithOrigins("http://localhost:8080").AllowAnyHeader().SetIsOriginAllowedToAllowWildcardSubdomains().AllowCredentials());
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller}/{action}/{id?}",
-                    defaults: new { controller = "Home", action = "Index" });
+                endpoints.MapControllers();
             });
         }
     }

@@ -46,9 +46,7 @@ namespace Accountancy.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AddressLine = table.Column<string>(nullable: true),
                     BankAccount = table.Column<string>(nullable: true),
-                    CityLine = table.Column<string>(nullable: true),
                     ContactPersonId = table.Column<int>(nullable: true),
                     FullName = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
@@ -63,6 +61,29 @@ namespace Accountancy.Migrations
                         name: "FK_Company_Person_ContactPersonId",
                         column: x => x.ContactPersonId,
                         principalTable: "Person",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CompanyAddress",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CompanyId = table.Column<int>(nullable: false),
+                    AddressLine = table.Column<string>(nullable: false),
+                    CityLine = table.Column<string>(nullable: false),
+                    Start = table.Column<DateTime>(nullable: false),
+                    End = table.Column<DateTime>(nullable: false),
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CompanyAddress", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CompanyAddress_Company_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Company",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -115,51 +136,22 @@ namespace Accountancy.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_InvoiceLine", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_InvoiceLine_Invoice_InvoiceId",
-                        column: x => x.InvoiceId,
-                        principalTable: "Invoice",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(name: "FK_InvoiceLine_Invoice_InvoiceId", column: x => x.InvoiceId, principalTable: "Invoice", principalColumn: "Id", onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Company_ContactPersonId",
-                table: "Company",
-                column: "ContactPersonId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Invoice_IssuingCompanyId",
-                table: "Invoice",
-                column: "IssuingCompanyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Invoice_ReceivingCompanyId",
-                table: "Invoice",
-                column: "ReceivingCompanyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_InvoiceLine_InvoiceId",
-                table: "InvoiceLine",
-                column: "InvoiceId");
+            migrationBuilder.CreateIndex(name: "IX_Company_ContactPersonId", table: "Company", column: "ContactPersonId");
+            migrationBuilder.CreateIndex(name: "IX_Invoice_IssuingCompanyId", table: "Invoice", column: "IssuingCompanyId");
+            migrationBuilder.CreateIndex(name: "IX_Invoice_ReceivingCompanyId", table: "Invoice", column: "ReceivingCompanyId");
+            migrationBuilder.CreateIndex(name: "IX_InvoiceLine_InvoiceId", table: "InvoiceLine", column: "InvoiceId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "InvoiceLine");
-
-            migrationBuilder.DropTable(
-                name: "User");
-
-            migrationBuilder.DropTable(
-                name: "Invoice");
-
-            migrationBuilder.DropTable(
-                name: "Company");
-
-            migrationBuilder.DropTable(
-                name: "Person");
+            migrationBuilder.DropTable(name: "InvoiceLine");
+            migrationBuilder.DropTable(name: "User");
+            migrationBuilder.DropTable(name: "Invoice");
+            migrationBuilder.DropTable(name: "Company");
+            migrationBuilder.DropTable(name: "Person");
         }
     }
 }

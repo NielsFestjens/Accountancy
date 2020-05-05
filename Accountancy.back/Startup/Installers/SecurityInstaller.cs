@@ -4,11 +4,9 @@ using System.Threading.Tasks;
 using Accountancy.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Accountancy.Startup.Installers
 {
@@ -39,10 +37,10 @@ namespace Accountancy.Startup.Installers
             });
         }
 
-        public static void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public static void Configure(IApplicationBuilder app)
         {
-            app.UseCors(builder => builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod().AllowCredentials());
             app.UseAuthentication();
+            app.UseAuthorization();
         }
     }
 }

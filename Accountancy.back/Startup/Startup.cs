@@ -1,9 +1,8 @@
 ﻿using Accountancy.Startup.Installers;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
 
 namespace Accountancy.Startup
 {
@@ -11,7 +10,7 @@ namespace Accountancy.Startup
     {
         public IConfigurationRoot Configuration { get; }
 
-        public Startup(IHostingEnvironment env)
+        public Startup(IHostEnvironment env)
         {
             Configuration = ConfigurationInstaller.BuildConfiguration(env);
         }
@@ -24,12 +23,11 @@ namespace Accountancy.Startup
             SecurityInstaller.ConfigureServices(services);
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
-            LoggingInstaller.Configure(app, env, loggerFactory, Configuration.GetSection("Logging"));
-            ExceptionInstaller.Configure(app, env, loggerFactory);
-            SecurityInstaller.Configure(app, env, loggerFactory);
-            MvcInstaller.Configure(app, env, loggerFactory);
+            ExceptionInstaller.Configure(app);
+            SecurityInstaller.Configure(app);
+            MvcInstaller.Configure(app);
         }
     }
 }
