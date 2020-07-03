@@ -246,6 +246,8 @@ namespace Accountancy.Migrations
             invoiceInserter.CreateInvoices( 9.31m);
             invoiceInserter.CreateInvoices(22.46m);
             invoiceInserter.CreateInvoices(22.03m);
+            invoiceInserter.CreateInvoices(19.78m);
+            invoiceInserter.CreateInvoices(20.63m);
         }
     }
 }
