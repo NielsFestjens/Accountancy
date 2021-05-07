@@ -43,6 +43,11 @@ namespace Accountancy.Migrations
                 _factuurNr = 0;
             }
 
+            public void SetDagprijs(decimal newDagprijs)
+            {
+                _dagprijs = newDagprijs;
+            }
+
             private void CreateInvoice(Company receiver, InvoiceStatus status, decimal? amount, string theirReference)
             {
                 var date = new DateTime(_jaar, _maand, DateTime.DaysInMonth(_jaar, _maand));
@@ -248,6 +253,19 @@ namespace Accountancy.Migrations
             invoiceInserter.CreateInvoices(22.03m);
             invoiceInserter.CreateInvoices(19.78m);
             invoiceInserter.CreateInvoices(20.63m);
+            invoiceInserter.CreateInvoices(12.38m);
+            invoiceInserter.SetDagprijs(545m);
+            invoiceInserter.CreateInvoices(10.81m);
+            invoiceInserter.CreateInvoices(22.84m);
+            invoiceInserter.CreateInvoices(23.06m);
+            invoiceInserter.CreateInvoices(20.19m);
+            invoiceInserter.CreateInvoices(22.13m);
+            
+            invoiceInserter.StartJaar(540.00m, 2021);
+            invoiceInserter.CreateInvoices(20.00m);
+            invoiceInserter.CreateInvoices(19.75m);
+            invoiceInserter.CreateInvoices(23.25m);
+            invoiceInserter.CreateInvoices(21.06m);
         }
     }
 }
