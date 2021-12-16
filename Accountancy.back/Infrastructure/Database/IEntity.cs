@@ -1,7 +1,6 @@
-﻿namespace Accountancy.Infrastructure.Database
+﻿namespace Accountancy.Infrastructure.Database;
+
+public interface IEntity<T>
 {
-    public interface IEntity<T>
-    {
-        T Id { get; set; }
-    }
+    T Id { get; set; }
 }

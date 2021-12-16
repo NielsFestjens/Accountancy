@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Accountancy.Domain.Invoices;
+﻿using Accountancy.Domain.Invoices;
 using Accountancy.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -35,9 +32,8 @@ namespace Accountancy.Migrations
                 _cronos = cronos;
             }
 
-            public void StartJaar(decimal newDagprijs, int newJaar, int newMaand = 1)
+            public void StartJaar(int newJaar, int newMaand = 1)
             {
-                _dagprijs = newDagprijs;
                 _jaar = newJaar;
                 _maand = newMaand;
                 _factuurNr = 0;
@@ -91,6 +87,10 @@ namespace Accountancy.Migrations
                     CreateInvoice(_cronos, InvoiceStatus.Sent, amountCronos, ReferenceCronos);
 
                 _maand++;
+                if (_maand == 13) {
+                    _maand = 1;
+                    _jaar++;
+                }
             }
         }
 
@@ -188,14 +188,21 @@ namespace Accountancy.Migrations
                     {
                         AddressLine = "Hollebeekstraat 5 bus 3",
                         CityLine = "2840 Rumst",
-                        Start = new DateTime(2017, 10, 1),
-                        End = new DateTime(2020, 05, 1)
+                        Start = new DateTime(2017, 10, 01),
+                        End = new DateTime(2020, 05, 01)
                     },
                     new CompanyAddress
                     {
                         AddressLine = "Heist-Goorstraat 53A bus 5",
                         CityLine = "2220 Heist-op-den-Berg",
-                        Start = new DateTime(2020, 05, 1),
+                        Start = new DateTime(2020, 05, 01),
+                        End = new DateTime(2021, 06, 01)
+                    },
+                    new CompanyAddress
+                    {
+                        AddressLine = "Goorlei 26",
+                        CityLine = "2220 Heist-op-den-Berg",
+                        Start = new DateTime(2021, 06, 01),
                         End = new DateTime(2100, 12, 31)
                     }
                 },
@@ -211,12 +218,14 @@ namespace Accountancy.Migrations
         {
             var invoiceInserter = new InvoiceInserter(context, nfSoftware, qframe, cronos);
 
-            invoiceInserter.StartJaar(520.00m, 2017, 10);
+            invoiceInserter.StartJaar(2017, 10);
+            invoiceInserter.SetDagprijs(520m);
             invoiceInserter.CreateInvoices(2.78m, 17.94m); 
             invoiceInserter.CreateInvoices(1.53m, 20.28m);
             invoiceInserter.CreateInvoices(1.13m, 22.44m);
 
-            invoiceInserter.StartJaar(520.00m, 2018);
+            // 2018
+            invoiceInserter.SetDagprijs(520m);
             invoiceInserter.CreateInvoices(1.51m, 25.20m);
             invoiceInserter.ReferenceCronos = "CRO18/0257/0001";
             invoiceInserter.CreateInvoices(0.25m, 24.38m);
@@ -231,7 +240,8 @@ namespace Accountancy.Migrations
             invoiceInserter.CreateInvoices(1.50m, 19.75m);
             invoiceInserter.CreateInvoices(0.56m, 19.44m);
 
-            invoiceInserter.StartJaar(540.00m, 2019);
+            // 2019
+            invoiceInserter.SetDagprijs(540m);
             invoiceInserter.CreateInvoices(22.38m);
             invoiceInserter.CreateInvoices(18.00m);
             invoiceInserter.CreateInvoices(21.03m);
@@ -246,7 +256,8 @@ namespace Accountancy.Migrations
             invoiceInserter.CreateInvoices(19.00m);
             invoiceInserter.CreateInvoices(19.44m);
 
-            invoiceInserter.StartJaar(540.00m, 2020);
+            // 2020
+            invoiceInserter.SetDagprijs(540m);
             invoiceInserter.CreateInvoices(20.56m);
             invoiceInserter.CreateInvoices( 9.31m);
             invoiceInserter.CreateInvoices(22.46m);
@@ -261,11 +272,43 @@ namespace Accountancy.Migrations
             invoiceInserter.CreateInvoices(20.19m);
             invoiceInserter.CreateInvoices(22.13m);
             
-            invoiceInserter.StartJaar(540.00m, 2021);
+            // 2021
+            invoiceInserter.SetDagprijs(540m);
             invoiceInserter.CreateInvoices(20.00m);
             invoiceInserter.CreateInvoices(19.75m);
             invoiceInserter.CreateInvoices(23.25m);
             invoiceInserter.CreateInvoices(21.06m);
+            invoiceInserter.CreateInvoices(19.13m);
+            invoiceInserter.CreateInvoices(21.53m);
+            invoiceInserter.CreateInvoices( 9.41m);
+            invoiceInserter.CreateInvoices(10.10m);
+            invoiceInserter.SetDagprijs(560m);
+            invoiceInserter.CreateInvoices(19.66m);
+            invoiceInserter.CreateInvoices(20.41m);
+            invoiceInserter.CreateInvoices(18.44m);
+            invoiceInserter.CreateInvoices(20.13m);
+            
+            // 2022
+            invoiceInserter.SetDagprijs(575m);
+            invoiceInserter.CreateInvoices(20.00m);
+            invoiceInserter.CreateInvoices(20.00m);
+            invoiceInserter.CreateInvoices(17.00m);
+            invoiceInserter.CreateInvoices(20.00m);
+            invoiceInserter.CreateInvoices(23.38m);
+            invoiceInserter.CreateInvoices(20.31m);
+            invoiceInserter.CreateInvoices( 9.28m);
+            invoiceInserter.CreateInvoices(14.56m);
+            invoiceInserter.CreateInvoices(15.19m);
+            invoiceInserter.CreateInvoices(21.44m);
+            invoiceInserter.CreateInvoices(20.53m);
+            invoiceInserter.CreateInvoices(18.34m);
+            
+            // 2023
+            invoiceInserter.SetDagprijs(625m);
+            invoiceInserter.CreateInvoices(19.06m);
+
+            // 2024
+            invoiceInserter.SplitRoyalties = false;
         }
     }
 }

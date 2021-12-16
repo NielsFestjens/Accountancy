@@ -1,13 +1,11 @@
-using Accountancy.Controllers.Documents;
-using Microsoft.Extensions.DependencyInjection;
+using Accountancy.Domain.Documents;
 
-namespace Accountancy.Startup.Installers
+namespace Accountancy.Startup.Installers;
+
+public class DocumentIntaller
 {
-    public class DocumentIntaller
+    public static void ConfigureServices(IServiceCollection services)
     {
-        public static void ConfigureServices(IServiceCollection services)
-        {
-            services.AddTransient<IInvoicePdfCreator, InvoicePdfCreator>();
-        }
+        services.AddTransient<IInvoicePdfCreator, InvoicePdfCreator>();
     }
 }

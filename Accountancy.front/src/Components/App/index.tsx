@@ -1,55 +1,52 @@
-import * as React from 'react'
-import { Component } from 'react'
-import { connect } from 'react-redux'
-import { bindActionCreators, Dispatch } from "redux";
-import { Route, Switch, withRouter } from 'react-router';
-import { History } from 'history';
-
-import Login from 'Components/Auth/Login';
-import Navbar from 'Components/Layout/Navbar';
+import { useState } from 'react'
+import { Route, Routes, useNavigate } from 'react-router';
+import { useLocation } from 'react-router';
+import useAsyncEffect from 'use-async-effect';
 import NotificationsContainer from 'Components/Blocks/Notifications';
-import Notification from 'Components/Blocks/Notifications/Notification';
+import Notification, { NotificationType } from 'Components/Blocks/Notifications/Notification';
+import { getLoggedInUser } from "Components/Auth/DataService";
+import { User } from 'Components/Auth/models';
+import uniqueId from 'Infrastructure/UniqueId';
 import Dashboard from 'Components/Dashboard';
 import Invoices from 'Components/Invoices';
-import startup from './startup';
-import { User } from 'Components/Auth/models';
-import State from 'State';
+import Navbar from 'Components/Layout/NavBar';
 
-interface IProps {
-    dispatch?: (action: any) => void;
-    history?: History;
+const App = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState<User | undefined>();
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const addNotificationError = (message: string) => {
+        setNotifications([...notifications, { id: uniqueId(), type: NotificationType.error, message }])
+    }
 
-    isAuthenticated: boolean;
-    user: User;
-}
+    const location = useLocation();
+    const navigate = useNavigate();
 
-var mapStateToProps = (state: State): IProps => ({
-    isAuthenticated: state.auth.isAuthenticated,
-    user: state.auth.user,
-})
+    useAsyncEffect(async isMounted => {
+        const response = await getLoggedInUser(addNotificationError)
+        if (!isMounted() || !response.content.user)
+            return;
 
-class App extends Component<IProps> {
-    render() {
-        const props = this.props;
-        return (
-            <div>
-                <Navbar isAuthenticated={props.isAuthenticated}  dispatch={props.dispatch} user={props.user} history={props.history} />
-                <div className='container'>
-                    {props.isAuthenticated && 
-                        <Switch>
-                            <Route path="/dashboard" component={Dashboard} />
-                            <Route path="/invoices" component={Invoices} />
-                        </Switch>
-                    }
-                </div>
-                <NotificationsContainer />
+        setIsAuthenticated(true);
+        setUser(response.content.user);
+        if (location.pathname === '/')
+            navigate('/dashboard');
+    }, []);
+
+    return (
+        <div>
+            <Navbar isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} user={user} setUser={setUser} addNotificationError={addNotificationError} />
+            <div className='container'>
+                {isAuthenticated && 
+                    <Routes>
+                        <Route path="/dashboard" element={<Dashboard addNotificationError={addNotificationError} />} />
+                        <Route path="/invoices" element={<Invoices addNotificationError={addNotificationError} />} />
+                    </Routes>
+                }
             </div>
-        )
-    }
-
-    componentWillMount() {
-        startup(this.props.dispatch, this.props.history);
-    }
+            <NotificationsContainer notifications={notifications} setNotifications={setNotifications} />
+        </div>
+    )
 }
 
-export default withRouter(connect(mapStateToProps)(App));
+export default App;

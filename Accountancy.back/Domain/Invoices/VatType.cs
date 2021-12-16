@@ -1,7 +1,6 @@
-﻿namespace Accountancy.Domain.Invoices
+﻿namespace Accountancy.Domain.Invoices;
+
+public enum VatType
 {
-    public enum VatType
-    {
-        Vat21 = 21
-    }
+    Vat21 = 21
 }
