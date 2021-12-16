@@ -1,5 +1,3 @@
-using System.Linq;
-using System.Threading.Tasks;
 using Accountancy.Domain.Auth;
 using Accountancy.Infrastructure.Database;
 using Accountancy.Infrastructure.Exceptions;
@@ -7,44 +5,43 @@ using Accountancy.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Accountancy.Controllers.Auth
+namespace Accountancy.Controllers.Auth;
+
+public record LoginCommand
 {
-    public class LoginCommand
+    public string Username { get; set; }
+    public string Password { get; set; }
+}
+
+[Route("api/Auth/[controller]")]
+[AllowAnonymous]
+public class LoginController : Controller
+{
+    private readonly IRepository _repository;
+    private readonly ISecurityService _securityService;
+
+    public LoginController(IRepository repository, ISecurityService securityService)
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        _repository = repository;
+        _securityService = securityService;
     }
 
-    [Route("api/Auth/[controller]")]
-    [AllowAnonymous]
-    public class LoginController : Controller
+    [HttpPost]
+    public async Task Post([FromBody]LoginCommand command)
     {
-        private readonly IRepository _repository;
-        private readonly ISecurityService _securityService;
+        var user = _repository.Query<User>().SingleOrDefault(x => x.Username == command.Username);
+        var salt = user?.PasswordSalt ?? _securityService.GetSalt();
+        var hashedPassword = _securityService.CalculateHash(command.Password, salt);
+        if (user == null || user.Password != hashedPassword)
+            throw new BadUsernamePasswordCombinationException();
 
-        public LoginController(IRepository repository, ISecurityService securityService)
-        {
-            _repository = repository;
-            _securityService = securityService;
-        }
-
-        [HttpPost]
-        public async Task Post([FromBody]LoginCommand command)
-        {
-            var user = _repository.Query<User>().SingleOrDefault(x => x.Username == command.Username);
-            var salt = user?.PasswordSalt ?? _securityService.GetSalt();
-            var hashedPassword = _securityService.CalculateHash(command.Password, salt);
-            if (user == null || user.Password != hashedPassword)
-                throw new BadUsernamePasswordCombinationException();
-
-            await _securityService.SignIn(HttpContext, user);
-        }
+        await _securityService.SignIn(HttpContext, user);
     }
+}
 
-    public class BadUsernamePasswordCombinationException : KnownException
+public class BadUsernamePasswordCombinationException : KnownException
+{
+    public BadUsernamePasswordCombinationException() : base("Bad username/password combination")
     {
-        public BadUsernamePasswordCombinationException() : base("Bad username/password combination")
-        {
-        }
     }
 }

@@ -3,4 +3,4 @@ import { apiUri } from 'config';
 
 const apiCaller = new ApiCaller(apiUri + 'Invoices/');
 
-export const getInvoice = (id: number) => apiCaller.get('getInvoice', { id });
+export const getInvoice = (onError: (message: string) => void, id: number) => apiCaller.get(onError, 'getInvoice', { id });
