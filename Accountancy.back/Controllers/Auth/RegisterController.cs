@@ -1,54 +1,51 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Accountancy.Domain.Auth;
+﻿using Accountancy.Domain.Auth;
 using Accountancy.Infrastructure.Database;
 using Accountancy.Infrastructure.Exceptions;
 using Accountancy.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Accountancy.Controllers.Auth
+namespace Accountancy.Controllers.Auth;
+
+public record RegisterCommand
 {
-    public class RegisterCommand
+    public string Username { get; set; }
+    public string Password { get; set; }
+}
+
+[Route("api/Auth/[controller]")]
+[AllowAnonymous]
+public class RegisterController : Controller
+{
+    private readonly ISecurityService _securityService;
+    private readonly IRepository _repository;
+
+    public RegisterController(ISecurityService securityService, IRepository repository)
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        _securityService = securityService;
+        _repository = repository;
     }
 
-    [Route("api/Auth/[controller]")]
-    [AllowAnonymous]
-    public class RegisterController : Controller
+    [HttpPost]
+    public async Task Register([FromBody] RegisterCommand command)
     {
-        private readonly ISecurityService _securityService;
-        private readonly IRepository _repository;
+        var salt = _securityService.GetSalt();
+        var password = _securityService.CalculateHash(command.Password, salt);
 
-        public RegisterController(ISecurityService securityService, IRepository repository)
-        {
-            _securityService = securityService;
-            _repository = repository;
-        }
+        if (_repository.Query<User>().Any(x => x.Username == command.Username))
+            throw new UsernameAlreadyExistsException();
 
-        [HttpPost]
-        public async Task Register([FromBody] RegisterCommand command)
-        {
-            var salt = _securityService.GetSalt();
-            var password = _securityService.CalculateHash(command.Password, salt);
+        var user = new User { Username = command.Username, Password = password, PasswordSalt = salt };
 
-            if (_repository.Query<User>().Any(x => x.Username == command.Username))
-                throw new UsernameAlreadyExistsException();
+        _repository.AddAndSave(user);
 
-            var user = new User { Username = command.Username, Password = password, PasswordSalt = salt };
-
-            _repository.AddAndSave(user);
-
-            await _securityService.SignIn(HttpContext, user);
-        }
+        await _securityService.SignIn(HttpContext, user);
     }
+}
 
-    public class UsernameAlreadyExistsException : KnownException
+public class UsernameAlreadyExistsException : KnownException
+{
+    public UsernameAlreadyExistsException() : base("This username already exists")
     {
-        public UsernameAlreadyExistsException() : base("This username already exists")
-        {
-        }
     }
 }

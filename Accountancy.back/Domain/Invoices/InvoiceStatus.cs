@@ -1,9 +1,8 @@
-﻿namespace Accountancy.Domain.Invoices
+﻿namespace Accountancy.Domain.Invoices;
+
+public enum InvoiceStatus
 {
-    public enum InvoiceStatus
-    {
-        Draft,
-        Sent,
-        Paid,
-    }
+    Draft,
+    Sent,
+    Paid,
 }

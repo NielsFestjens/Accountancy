@@ -33,3 +33,9 @@ body {
 .table th {
     padding: 2px;
 }
+
+button.link {
+    border: none;
+    background: none;
+    color: #0d6efd;
+}
