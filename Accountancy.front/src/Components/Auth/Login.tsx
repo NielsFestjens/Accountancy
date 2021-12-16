@@ -1,33 +1,27 @@
-import * as React from 'react'
-import { Component } from 'react'
+import React, { useState } from 'react';
 
 export interface ILoginProps {
     onLoginClick: (username: string, password: string) => void;
     onRegisterClick: (username: string, password: string) => void;
 }
 
-export default class Login extends Component<ILoginProps> {
+const Login = (props: ILoginProps) => {
+    const { onLoginClick, onRegisterClick } = props;
 
-  render() {
+    const [username, setUserName] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLoginClick = () => onLoginClick(username.trim(), password.trim());
+    const handleRegisterClick = () => onRegisterClick(username.trim(), password.trim());
+    
     return (
-      <div>
-        <input type='text' ref='username' className="form-control" style={{width:100, display:"inline"}} placeholder='Username'/>&nbsp;
-        <input type='password' ref='password' className="form-control" style={{width:100, display:"inline"}} placeholder='Password'/>&nbsp;
-        <button onClick={this.handleLoginClick} className="btn btn-primary">Login</button>&nbsp;
-        <button onClick={this.handleRegisterClick} className="btn btn-primary">Register</button>
-      </div>
+        <div>
+            <input type='text' value={username} onChange={x => setUserName(x.target.value)} className="form-control" style={{width:100, display:"inline"}} placeholder='Username'/>&nbsp;
+            <input type='password' value={password} onChange={x => setPassword(x.target.value)}  className="form-control" style={{width:100, display:"inline"}} placeholder='Password'/>&nbsp;
+            <button onClick={handleLoginClick} className="btn btn-primary">Login</button>&nbsp;
+            <button onClick={handleRegisterClick} className="btn btn-primary">Register</button>
+        </div>
     )
-  }
-
-  handleLoginClick = () => {
-    const username = this.refs.username as HTMLInputElement;
-    const password = this.refs.password as HTMLInputElement;
-    this.props.onLoginClick(username.value.trim(), password.value.trim());
-  }
-
-  handleRegisterClick = () => {
-    const username = this.refs.username as HTMLInputElement;
-    const password = this.refs.password as HTMLInputElement;
-    this.props.onRegisterClick(username.value.trim(), password.value.trim());
-  }
 }
+
+export default Login;

@@ -1,16 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Accountancy.Controllers
+namespace Accountancy.Controllers;
+
+[Route("")]
+[AllowAnonymous]
+public class HomeController : Controller
 {
-    [Route("")]
-    [AllowAnonymous]
-    public class HomeController : Controller
+    [HttpGet]
+    public ActionResult Get()
     {
-        [HttpGet]
-        public ActionResult Get()
-        {
-            return Redirect("http://localhost:8080");
-        }
+        return Redirect("http://localhost:8080");
     }
 }

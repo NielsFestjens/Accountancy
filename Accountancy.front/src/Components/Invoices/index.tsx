@@ -1,26 +1,18 @@
 import * as React from 'react';
-import { Component } from 'react';
-import { connect } from 'react-redux'
-import { Switch } from 'react-router-dom';
-import { Route } from 'react-router';
+import { Route, Routes } from 'react-router';
 import Detail from './Detail';
-import State from 'State';
 
-interface IProps {
-    dispatch?: (action: any) => void;
+type InvoicesProps = {
+    addNotificationError: (message: string) => void;
 }
 
-var mapStateToProps = (state: State): IProps => ({
-});
+const Invoices = (props: InvoicesProps) => {
+    const { addNotificationError } = props;
 
-class Invoices extends Component<IProps> {
-    render() {
-        const props = this.props;
-        return (
-            <Switch>
-                <Route path="/Invoices/Invoice/:id" component={Detail} />
-            </Switch>
-        )
-    }
+    return (
+        <Routes>
+            <Route path="/Invoices/Invoice/:id"><Detail addNotificationError={addNotificationError} /></Route>
+        </Routes>
+    )
 }
-export default connect(mapStateToProps)(Invoices);
+export default Invoices;

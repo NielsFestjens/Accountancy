@@ -1,66 +1,61 @@
-import * as React from 'react';
-import { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { fetchInvoice } from './Actions';
-import { match } from 'react-router';
+import { useState } from 'react';
+import { useParams } from 'react-router';
+import useAsyncEffect from "use-async-effect";
 import { Invoice, InvoiceStatus } from 'Components/Invoices/models';
-import { connect } from 'react-redux';
-
-interface IParams {
-    id: number;
-}
+import * as DataService from './DataService';
 
 export interface IProps {
-    dispatch?: (action: any) => void;
-    match?: match<IParams>;
-    invoice?: Invoice
+    addNotificationError: (message: string) => void;
 }
 
-var mapStateToProps = (state: any): IProps => ({
-    invoice: state.invoices.invoice
-});
+const Detail = (props: IProps) => {
+    const { addNotificationError } = props;
 
-class Detail extends Component<IProps> {
-    render() {
-        const props = this.props;
+    const { id } = useParams();
 
-        return (
-            <div>
-                <h2>Factuur detail</h2>
-                { props.invoice && 
-                    <div>
-                        Jaar: { props.invoice.year }<br />
-                        Maand: { props.invoice.month }<br />
-                        Status: { InvoiceStatus[props.invoice.status] }<br />
-                        <table className="table">
-                        <thead>
-                            <tr>
-                                <th>Omschrijving</th>
-                                <th>Aantal</th>
-                                <th>Prijs</th>
-                                <th>Totaal</th>
+    const [invoice, setInvoice] = useState<Invoice>();
+
+    useAsyncEffect(async (isMounted) => {
+        if (!id)
+            return;
+        
+        const result = await DataService.getInvoice(addNotificationError, parseFloat(id));
+        if (isMounted())
+            setInvoice(result.content);
+    }, [id]);
+
+    return (
+        <div>
+            <h2>Factuur detail</h2>
+            { invoice && 
+                <div>
+                    Jaar: { invoice.year }<br />
+                    Maand: { invoice.month }<br />
+                    Status: { InvoiceStatus[invoice.status] }<br />
+                    <table className="table">
+                    <thead>
+                        <tr>
+                            <th>Omschrijving</th>
+                            <th>Aantal</th>
+                            <th>Prijs</th>
+                            <th>Totaal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {invoice.invoiceLines.map(x => 
+                            <tr key={x.id}>
+                                <td>{ x.description }</td>
+                                <td>{ x.amount.toFixed(2) }</td>
+                                <td>{ x.price.toFixed(2) }</td>
+                                <td>{ (x.price * x.amount).toFixed(2) }</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {this.props.invoice.invoiceLines.map(x => 
-                                <tr key={x.id}>
-                                    <td>{ x.description }</td>
-                                    <td>{ x.amount.toFixed(2) }</td>
-                                    <td>{ x.price.toFixed(2) }</td>
-                                    <td>{ (x.price * x.amount).toFixed(2) }</td>
-                                </tr>
-                            )}
-                        </tbody>
-                        </table>
-                    </div>
-                }
-            </div>
-        )
-    }
-
-    componentDidMount() {
-        this.props.dispatch(fetchInvoice(this.props.match.params.id));
-    }
+                        )}
+                    </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    );
 }
 
-export default connect(mapStateToProps)(Detail);
+export default Detail;
