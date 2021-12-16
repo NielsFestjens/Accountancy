@@ -1,41 +1,37 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using System.Net;
 using Newtonsoft.Json;
 
-namespace Accountancy.Infrastructure.Exceptions
+namespace Accountancy.Infrastructure.Exceptions;
+
+public class ErrorHandlingMiddleware
 {
-    public class ErrorHandlingMiddleware
+    private readonly RequestDelegate _next;
+
+    public ErrorHandlingMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate _next;
+        _next = next;
+    }
 
-        public ErrorHandlingMiddleware(RequestDelegate next)
+    public async Task Invoke(HttpContext context)
+    {
+        try
         {
-            _next = next;
+            await _next(context);
         }
-
-        public async Task Invoke(HttpContext context)
+        catch (Exception ex)
         {
-            try
-            {
-                await _next(context);
-            }
-            catch (Exception ex)
-            {
-                await HandleExceptionAsync(context, ex);
-            }
+            await HandleExceptionAsync(context, ex);
         }
+    }
 
-        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
-        {
-            var knownException = exception as KnownException;
-            var code = knownException?.HttpStatusCode ?? HttpStatusCode.InternalServerError;
+    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        var knownException = exception as KnownException;
+        var code = knownException?.HttpStatusCode ?? HttpStatusCode.InternalServerError;
             
-            var result = JsonConvert.SerializeObject(new { error = exception.Message });
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)code;
-            return context.Response.WriteAsync(result);
-        }
+        var result = JsonConvert.SerializeObject(new { error = exception.Message });
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = (int)code;
+        return context.Response.WriteAsync(result);
     }
 }

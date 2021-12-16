@@ -1,7 +1,7 @@
 export class Notification {
-    id: number;
-    message: string;
-    type: NotificationType;
+    id!: number;
+    message!: string;
+    type!: NotificationType;
 }
 
 export enum NotificationType {

@@ -2,16 +2,15 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Accountancy.Controllers.Auth
+namespace Accountancy.Controllers.Auth;
+
+[Route("api/Auth/[controller]")]
+[AllowAnonymous]
+public class LogoutController : Controller
 {
-    [Route("api/Auth/[controller]")]
-    [AllowAnonymous]
-    public class LogoutController : Controller
+    [HttpPost]
+    public async void Post([FromBody]LoginCommand command)
     {
-        [HttpPost]
-        public async void Post([FromBody]LoginCommand command)
-        {
-            await HttpContext.SignOutAsync("DatScheme");
-        }
+        await HttpContext.SignOutAsync("DatScheme");
     }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Accountancy.Domain.Invoices;
+﻿using Accountancy.Domain.Invoices;
 using Accountancy.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -188,14 +185,21 @@ namespace Accountancy.Migrations
                     {
                         AddressLine = "Hollebeekstraat 5 bus 3",
                         CityLine = "2840 Rumst",
-                        Start = new DateTime(2017, 10, 1),
-                        End = new DateTime(2020, 05, 1)
+                        Start = new DateTime(2017, 10, 01),
+                        End = new DateTime(2020, 05, 01)
                     },
                     new CompanyAddress
                     {
                         AddressLine = "Heist-Goorstraat 53A bus 5",
                         CityLine = "2220 Heist-op-den-Berg",
-                        Start = new DateTime(2020, 05, 1),
+                        Start = new DateTime(2020, 05, 01),
+                        End = new DateTime(2021, 06, 01)
+                    },
+                    new CompanyAddress
+                    {
+                        AddressLine = "Goorlei 26",
+                        CityLine = "2220 Heist-op-den-Berg",
+                        Start = new DateTime(2021, 06, 01),
                         End = new DateTime(2100, 12, 31)
                     }
                 },
@@ -266,6 +270,14 @@ namespace Accountancy.Migrations
             invoiceInserter.CreateInvoices(19.75m);
             invoiceInserter.CreateInvoices(23.25m);
             invoiceInserter.CreateInvoices(21.06m);
+            invoiceInserter.CreateInvoices(19.13m);
+            invoiceInserter.CreateInvoices(21.53m);
+            invoiceInserter.CreateInvoices( 9.41m);
+            invoiceInserter.CreateInvoices(10.10m);
+            invoiceInserter.SetDagprijs(560m);
+            invoiceInserter.CreateInvoices(19.66m);
+            invoiceInserter.CreateInvoices(20.41m);
+            invoiceInserter.CreateInvoices(18.44m);
         }
     }
 }
