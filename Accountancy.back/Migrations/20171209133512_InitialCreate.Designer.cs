@@ -25,47 +25,28 @@ namespace Accountancy.Migrations
 
             modelBuilder.Entity("Accountancy.Domain.Auth.User", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
+                    b.Property<int>("Id").ValueGeneratedOnAdd();
                     b.Property<string>("Password");
-
                     b.Property<byte[]>("PasswordSalt");
-
                     b.Property<string>("Username");
-
                     b.HasKey("Id");
-
                     b.ToTable("User");
                 });
 
             modelBuilder.Entity("Accountancy.Domain.Invoices.Company", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
+                    b.Property<int>("Id").ValueGeneratedOnAdd();
                     b.Property<string>("AddressLine");
-
                     b.Property<string>("BankAccount");
-
                     b.Property<string>("CityLine");
-
                     b.Property<int?>("ContactPersonId");
-
                     b.Property<string>("FullName");
-
                     b.Property<string>("Name");
-
                     b.Property<string>("Recipients");
-
                     b.Property<string>("VAT");
-
                     b.Property<string>("Website");
-
                     b.HasKey("Id");
-
                     b.HasIndex("ContactPersonId");
-
                     b.ToTable("Company");
                 });
 
@@ -73,67 +54,42 @@ namespace Accountancy.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
-
                     b.Property<DateTime>("Date");
-
                     b.Property<int>("ExpiryPeriodDays");
-
                     b.Property<int?>("IssuingCompanyId");
-
                     b.Property<int>("Month");
-
                     b.Property<int?>("ReceivingCompanyId");
-
                     b.Property<int>("Status");
-
                     b.Property<int>("Year");
-
+                    b.Property<string>("TheirReference");
+                    b.Property<string>("ExtraInformation");
                     b.HasKey("Id");
-
                     b.HasIndex("IssuingCompanyId");
-
                     b.HasIndex("ReceivingCompanyId");
-
                     b.ToTable("Invoice");
                 });
 
             modelBuilder.Entity("Accountancy.Domain.Invoices.InvoiceLine", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
+                    b.Property<int>("Id").ValueGeneratedOnAdd();
                     b.Property<decimal>("Amount");
-
                     b.Property<string>("Description");
-
                     b.Property<int?>("InvoiceId");
-
                     b.Property<decimal>("Price");
-
                     b.Property<int>("VatType");
-
                     b.HasKey("Id");
-
                     b.HasIndex("InvoiceId");
-
                     b.ToTable("InvoiceLine");
                 });
 
             modelBuilder.Entity("Accountancy.Domain.Invoices.Person", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
+                    b.Property<int>("Id").ValueGeneratedOnAdd();
                     b.Property<string>("Email");
-
                     b.Property<string>("FirstName");
-
                     b.Property<string>("LastName");
-
                     b.Property<string>("Phone");
-
                     b.HasKey("Id");
-
                     b.ToTable("Person");
                 });
 

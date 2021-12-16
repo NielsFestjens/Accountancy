@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using System;
-using System.Collections.Generic;
 
 namespace Accountancy.Migrations
 {
@@ -102,7 +100,8 @@ namespace Accountancy.Migrations
                     ReceivingCompanyId = table.Column<int>(nullable: true),
                     Status = table.Column<int>(nullable: false),
                     Year = table.Column<int>(nullable: false),
-                    TheirReference = table.Column<string>(nullable: true)
+                    TheirReference = table.Column<string>(nullable: true),
+                    ExtraInformation = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

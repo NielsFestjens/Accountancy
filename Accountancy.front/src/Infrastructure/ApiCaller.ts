@@ -1,6 +1,3 @@
-import * as notifications from 'Components/Blocks/Notifications/Actions'
-import dispatch from 'Infrastructure/dispatch';
-
 export default class ApiCaller {
     constructor(private baseUri: string) {
     }
@@ -13,21 +10,21 @@ export default class ApiCaller {
         return parts.join('&');
     }
     
-    get(path: string, request: any = {}) {
+    get(onError: (message: string) => void, path: string, request: any = {}) {
         const config: RequestInit = {
             method: 'GET',
             credentials: 'include'
         }
         return fetch(`${this.baseUri}${path}?${this.convertToQueryString(request)}`, config)
-              .then(response => !response.ok ? { response, content: undefined } : response.json().then(content => ({ response, content })))
-              .catch(error => {
-                dispatch(notifications.addError(error.message));
-                  console.error(error);
-                  throw error;
-              });
+            .then(response => !response.ok ? { response, content: undefined } : response.json().then(content => ({ response, content })))
+            .catch(error => {
+                onError(error.message);
+                console.error(error);
+                throw error;
+            });
     }
     
-    post(path: string, body: any = {}) {
+    post(onError: (message: string) => void, path: string, body: any = {}) {
         const config: RequestInit = {
             method: 'POST',
             credentials: "include",
@@ -38,22 +35,22 @@ export default class ApiCaller {
         }
     
         return fetch(this.baseUri + path, config)
-            .then(this.handlePostResponse)
+            .then(x => this.handlePostResponse(onError, x))
             .catch(error => {
-                dispatch(notifications.addError(error.message));
+                onError(error.message);
                 console.error( error);
                 throw error;
             });
     }
 
-    private handlePostResponse(response: Response) {
+    private handlePostResponse(onError: (message: string) => void, response: Response) {
         if (response.ok)
             return { response, content: undefined as any };
 
-        if (response.status == 400 || response.status === 500)
+        if (response.status === 400 || response.status === 500)
             return response.json().then(content => ({ response, content }));
         
-        dispatch(notifications.addError('Er is iets misgegaan tijdens het uitvoeren van een opdracht op de server'));
+        onError('Er is iets misgegaan tijdens het uitvoeren van een opdracht op de server');
         console.error(response);
     }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Accountancy.Domain.Invoices;
+﻿using Accountancy.Domain.Invoices;
 using Accountancy.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -18,8 +15,9 @@ namespace Accountancy.Migrations
             private readonly Company _nfSoftware;
             private readonly Company _qframe;
             private readonly Company _cronos;
+            private readonly Company _nielsFestjens;
 
-            private decimal _dagprijs;
+            public decimal Dagprijs;
             private int _jaar;
             private int _maand;
             private int _factuurNr;
@@ -27,17 +25,18 @@ namespace Accountancy.Migrations
             public string ReferenceCronos { get; set; }
             public bool SplitRoyalties { get; set; }
 
-            public InvoiceInserter(DatabaseContext context, Company nfSoftware, Company qframe, Company cronos)
+            public InvoiceInserter(DatabaseContext context, Company nfSoftware, Company qframe, Company cronos,
+                Company nielsFestjens)
             {
                 _context = context;
                 _nfSoftware = nfSoftware;
                 _qframe = qframe;
                 _cronos = cronos;
+                _nielsFestjens = nielsFestjens;
             }
 
-            public void StartJaar(decimal newDagprijs, int newJaar, int newMaand = 1)
+            public void StartJaar(int newJaar, int newMaand = 1)
             {
-                _dagprijs = newDagprijs;
                 _jaar = newJaar;
                 _maand = newMaand;
                 _factuurNr = 0;
@@ -45,10 +44,10 @@ namespace Accountancy.Migrations
 
             public void SetDagprijs(decimal newDagprijs)
             {
-                _dagprijs = newDagprijs;
+                Dagprijs = newDagprijs;
             }
 
-            private void CreateInvoice(Company receiver, InvoiceStatus status, decimal? amount, string theirReference)
+            private void CreateInvoice(Company receiver, InvoiceStatus status, decimal? amount, string theirReference, (string name, decimal amount, decimal price)[]? extraLines, decimal? internalDays)
             {
                 var date = new DateTime(_jaar, _maand, DateTime.DaysInMonth(_jaar, _maand));
                 _context.Add(new Invoice
@@ -62,35 +61,81 @@ namespace Accountancy.Migrations
                     ExpiryPeriodDays = 30,
                     Status = status,
                     TheirReference = theirReference,
-                    InvoiceLines = GetInvoiceLines(amount).ToList()
+                    InvoiceLines = GetInvoiceLines(amount, extraLines, internalDays).ToList()
                 });
                 _context.SaveChanges();
             }
 
-            private IEnumerable<InvoiceLine> GetInvoiceLines(decimal? amount)
+            private IEnumerable<InvoiceLine> GetInvoiceLines(decimal? amount, (string name, decimal amount, decimal price)[]? extraLines, decimal? internalDays)
             {
                 if (amount == null)
                     yield break;
 
-                if (!SplitRoyalties)
+                if (SplitRoyalties)
                 {
-                    yield return new InvoiceLine("Gepresteerde dagen", amount.Value, _dagprijs);
-                    yield break;
+                    yield return new InvoiceLine("Gepresteerde dagen", amount.Value, Dagprijs * 3 / 4);
+                    yield return new InvoiceLine("Vergoeding overdracht auteursrechten", amount.Value, Dagprijs / 4);
+                }
+                else
+                {
+                    yield return new InvoiceLine("Gepresteerde dagen", amount.Value - (internalDays ?? 0), Dagprijs);
+                    if (internalDays.HasValue)
+                        yield return new InvoiceLine("Gepresteerde interne dagen", internalDays.Value, Dagprijs);
                 }
 
-                yield return new InvoiceLine("Gepresteerde dagen", amount.Value, _dagprijs * 3 / 4);
-                yield return new InvoiceLine("Vergoeding overdracht auteursrechten", amount.Value, _dagprijs / 4);
+                if (extraLines != null)
+                {
+                    foreach (var line in extraLines)
+                    {
+                        yield return new InvoiceLine(line.name, line.amount, line.price * line.amount);
+                    }
+                }
             }
 
-            public void CreateInvoices(decimal? amountQframe, decimal? amountCronos = null)
+            public void CreateInvoices(decimal? amountQframe, decimal? amountCronos = null, (string name, decimal amount, decimal price)[]? extraLinesQframe = null, decimal? internalDays = null)
             {
                 if (amountQframe.HasValue)
-                    CreateInvoice(_qframe, InvoiceStatus.Sent, amountQframe, null);
+                    CreateInvoice(_qframe, InvoiceStatus.Sent, amountQframe, null, extraLinesQframe, internalDays);
 
                 if (amountCronos.HasValue)
-                    CreateInvoice(_cronos, InvoiceStatus.Sent, amountCronos, ReferenceCronos);
+                    CreateInvoice(_cronos, InvoiceStatus.Sent, amountCronos, ReferenceCronos, null, null);
 
                 _maand++;
+                if (_maand == 13)
+                {
+                    _maand = 1;
+                    _jaar++;
+                }
+            }
+
+            public void CreateInvoiceMazda()
+            {
+                var date = new DateTime(2025, 12, 31);
+                _context.Add(new Invoice
+                {
+                    Number = ++_factuurNr,
+                    IssuingCompany = _nfSoftware,
+                    ReceivingCompany = _nielsFestjens,
+                    Year = date.Year,
+                    Month = date.Month,
+                    Date = date,
+                    ExpiryPeriodDays = 30,
+                    Status = InvoiceStatus.Sent,
+                    TheirReference = null,
+                    InvoiceLines = new List<InvoiceLine>()
+                    {
+                        new InvoiceLine("Verkoop Mazda (50% onderhevig aan BTW)", 1, 3619.91m, VatType.Vat21),
+                        new InvoiceLine("Verkoop Mazda (50% vrijgesteld van BTW)", 1, 3619.91m, VatType.Vat0)
+                    },
+                    ExtraInformation = $"Personenwagen Mazda 6 Benzine 2017 Rood\r\n" +
+                                       $"Chassisnummer: JMZGL626601522817\r\n" +
+                                       $"Datum 1e inschrijving: 02/10/2017\r\n" +
+                                       $"Aantal kilometers: 132 329\r\n" +
+                                       $"Nummer proces-verbaal van de homologatie: 1*2001/116*04428*28\r\n" +
+                                       $"Cilinderinhoud: 1998\r\n" +
+                                       $"Motorvermogen: 107,00\r\n",
+                });
+                _context.SaveChanges();
             }
         }
 
@@ -101,10 +146,11 @@ namespace Accountancy.Migrations
                 var nfSoftware = InsertNfSoftware(context);
                 var qframe = InsertQframe(context);
                 var cronos = InsertCronos(context);
+                var nielsFestjens = InsertNielsFestjens(context);
 
                 context.SaveChanges();
 
-                InsertAllInvoices(context, nfSoftware, qframe, cronos);
+                InsertAllInvoices(context, nfSoftware, qframe, cronos, nielsFestjens);
 
                 context.SaveChanges();
             }
@@ -188,14 +234,21 @@ namespace Accountancy.Migrations
                     {
                         AddressLine = "Hollebeekstraat 5 bus 3",
                         CityLine = "2840 Rumst",
-                        Start = new DateTime(2017, 10, 1),
-                        End = new DateTime(2020, 05, 1)
+                        Start = new DateTime(2017, 10, 01),
+                        End = new DateTime(2020, 05, 01)
                     },
                     new CompanyAddress
                     {
                         AddressLine = "Heist-Goorstraat 53A bus 5",
                         CityLine = "2220 Heist-op-den-Berg",
-                        Start = new DateTime(2020, 05, 1),
+                        Start = new DateTime(2020, 05, 01),
+                        End = new DateTime(2021, 06, 01)
+                    },
+                    new CompanyAddress
+                    {
+                        AddressLine = "Goorlei 26",
+                        CityLine = "2220 Heist-op-den-Berg",
+                        Start = new DateTime(2021, 06, 01),
                         End = new DateTime(2100, 12, 31)
                     }
                 },
@@ -207,21 +260,57 @@ namespace Accountancy.Migrations
             return nfSoftware;
         }
 
-        private static void InsertAllInvoices(DatabaseContext context, Company nfSoftware, Company qframe, Company cronos)
+        private static Company InsertNielsFestjens(DatabaseContext context)
         {
-            var invoiceInserter = new InvoiceInserter(context, nfSoftware, qframe, cronos);
+            var contactPerson = new Person
+            {
+                FirstName = "Niels",
+                LastName = "Festjens",
+                Email = "festjens_niels@hotmail.com",
+                Phone = "+32 477 / 60 39 05"
+            };
+            context.Add(contactPerson);
 
-            invoiceInserter.StartJaar(520.00m, 2017, 10);
-            invoiceInserter.CreateInvoices(2.78m, 17.94m); 
+            var nielsFestjens = new Company
+            {
+                ContactPerson = contactPerson,
+                Name = "Niels Festjens",
+                FullName = "Niels Festjens",
+                Addresses = new List<CompanyAddress>
+                {
+                    new CompanyAddress
+                    {
+                        AddressLine = "Goorlei 26",
+                        CityLine = "2220 Heist-op-den-Berg",
+                        Start = new DateTime(2021, 06, 01),
+                        End = new DateTime(2100, 12, 31)
+                    }
+                },
+                VAT = null,
+                BankAccount = "BE08 4567 0630 4113"
+            };
+            context.Add(nielsFestjens);
+
+            return nielsFestjens;
+        }
+
+        private static void InsertAllInvoices(DatabaseContext context, Company nfSoftware, Company qframe, Company cronos, Company nielsFestjens)
+        {
+            var invoiceInserter = new InvoiceInserter(context, nfSoftware, qframe, cronos, nielsFestjens);
+
+            invoiceInserter.StartJaar(2017, 10);
+            invoiceInserter.SetDagprijs(520m);
+            invoiceInserter.CreateInvoices(2.78m, 17.94m);
             invoiceInserter.CreateInvoices(1.53m, 20.28m);
             invoiceInserter.CreateInvoices(1.13m, 22.44m);
 
-            invoiceInserter.StartJaar(520.00m, 2018);
+            // 2018
+            invoiceInserter.SetDagprijs(520m);
             invoiceInserter.CreateInvoices(1.51m, 25.20m);
             invoiceInserter.ReferenceCronos = "CRO18/0257/0001";
             invoiceInserter.CreateInvoices(0.25m, 24.38m);
             invoiceInserter.CreateInvoices(0.38m, 28.13m);
-            invoiceInserter.CreateInvoices(null , 26.06m);
+            invoiceInserter.CreateInvoices(null, 26.06m);
             invoiceInserter.CreateInvoices(0.94m, 19.44m);
             invoiceInserter.CreateInvoices(1.50m, 19.50m);
             invoiceInserter.CreateInvoices(1.13m, 17.69m);
@@ -231,7 +320,8 @@ namespace Accountancy.Migrations
             invoiceInserter.CreateInvoices(1.50m, 19.75m);
             invoiceInserter.CreateInvoices(0.56m, 19.44m);
 
-            invoiceInserter.StartJaar(540.00m, 2019);
+            // 2019
+            invoiceInserter.SetDagprijs(540m);
             invoiceInserter.CreateInvoices(22.38m);
             invoiceInserter.CreateInvoices(18.00m);
             invoiceInserter.CreateInvoices(21.03m);
@@ -246,9 +336,10 @@ namespace Accountancy.Migrations
             invoiceInserter.CreateInvoices(19.00m);
             invoiceInserter.CreateInvoices(19.44m);
 
-            invoiceInserter.StartJaar(540.00m, 2020);
+            // 2020
+            invoiceInserter.SetDagprijs(540m);
             invoiceInserter.CreateInvoices(20.56m);
-            invoiceInserter.CreateInvoices( 9.31m);
+            invoiceInserter.CreateInvoices(9.31m);
             invoiceInserter.CreateInvoices(22.46m);
             invoiceInserter.CreateInvoices(22.03m);
             invoiceInserter.CreateInvoices(19.78m);
@@ -260,12 +351,93 @@ namespace Accountancy.Migrations
             invoiceInserter.CreateInvoices(23.06m);
             invoiceInserter.CreateInvoices(20.19m);
             invoiceInserter.CreateInvoices(22.13m);
-            
-            invoiceInserter.StartJaar(540.00m, 2021);
+
+            // 2021
+            invoiceInserter.SetDagprijs(540m);
             invoiceInserter.CreateInvoices(20.00m);
             invoiceInserter.CreateInvoices(19.75m);
             invoiceInserter.CreateInvoices(23.25m);
             invoiceInserter.CreateInvoices(21.06m);
+            invoiceInserter.CreateInvoices(19.13m);
+            invoiceInserter.CreateInvoices(21.53m);
+            invoiceInserter.CreateInvoices(9.41m);
+            invoiceInserter.CreateInvoices(10.10m);
+            invoiceInserter.SetDagprijs(560m);
+            invoiceInserter.CreateInvoices(19.66m);
+            invoiceInserter.CreateInvoices(20.41m);
+            invoiceInserter.CreateInvoices(18.44m);
+            invoiceInserter.CreateInvoices(20.13m);
+
+            // 2022
+            invoiceInserter.SetDagprijs(575m);
+            invoiceInserter.CreateInvoices(20.00m);
+            invoiceInserter.CreateInvoices(20.00m);
+            invoiceInserter.CreateInvoices(17.00m);
+            invoiceInserter.CreateInvoices(20.00m);
+            invoiceInserter.CreateInvoices(23.38m);
+            invoiceInserter.CreateInvoices(20.31m);
+            invoiceInserter.CreateInvoices(9.28m);
+            invoiceInserter.CreateInvoices(14.56m);
+            invoiceInserter.CreateInvoices(15.19m);
+            invoiceInserter.CreateInvoices(21.44m);
+            invoiceInserter.CreateInvoices(20.53m);
+            invoiceInserter.CreateInvoices(18.34m);
+
+            // 2023
+            invoiceInserter.SetDagprijs(625m);
+            invoiceInserter.CreateInvoices(19.06m);
+            invoiceInserter.CreateInvoices(15.88m);
+            invoiceInserter.CreateInvoices(24.31m);
+            invoiceInserter.CreateInvoices(13.44m);
+            invoiceInserter.CreateInvoices(11.55m);
+            invoiceInserter.CreateInvoices(18.96m);
+            invoiceInserter.CreateInvoices(14.42m);
+            invoiceInserter.CreateInvoices(21.21m, null, new[] { ("Variabele vergoeding 2022", 1m, 1009m) });
+            invoiceInserter.CreateInvoices(10.28m);
+            invoiceInserter.CreateInvoices(22.09m, null, new[] { ("Interne dagen", 4m, 0m) });
+            invoiceInserter.CreateInvoices(20.94m);
+            invoiceInserter.CreateInvoices(20.25m, null, new[] { ("Interne dagen", 4m, 0m) });
+
+            // 2024
+            invoiceInserter.SplitRoyalties = false;
+            invoiceInserter.SetDagprijs(632.5m);
+            invoiceInserter.CreateInvoices(23.00m);
+            invoiceInserter.CreateInvoices(18.00m);
+            invoiceInserter.CreateInvoices(18.00m);
+            invoiceInserter.CreateInvoices(14.00m);
+            invoiceInserter.CreateInvoices(20.63m, null, null, 0.38m);
+            invoiceInserter.CreateInvoices(19.75m);
+            invoiceInserter.CreateInvoices(10.50m);
+            invoiceInserter.CreateInvoices(18.50m, null, new[] { ("Variabele vergoeding 2023", 1m, 4052.05m) });
+            invoiceInserter.CreateInvoices(17m);
+            invoiceInserter.CreateInvoices(22.75m, null, null, 2.5m);
+            invoiceInserter.CreateInvoices(21);
+            invoiceInserter.CreateInvoices(18.75m, null, null, 0.75m);
+
+            // 2025
+            invoiceInserter.SetDagprijs(670.45m);
+            invoiceInserter.CreateInvoices(19.50m);
+            invoiceInserter.CreateInvoices(20.50m);
+            invoiceInserter.CreateInvoices(21.25m, null, null, 0.5m);
+            invoiceInserter.CreateInvoices(13.25m);
+            invoiceInserter.CreateInvoices(18m);
+            invoiceInserter.CreateInvoices(15m);
+            invoiceInserter.CreateInvoices(14m);
+            invoiceInserter.CreateInvoices(13m, null, new[] { ("Variabele vergoeding 2024", 1m, 6276.59m) });
+            invoiceInserter.CreateInvoices(22m, null, null, 1m);
+            invoiceInserter.CreateInvoices(21m);
+            invoiceInserter.CreateInvoices(19m);
+            invoiceInserter.CreateInvoices(21m);
+            invoiceInserter.CreateInvoiceMazda();
+
+            // 2026
+            invoiceInserter.SetDagprijs(683.19m);
+            invoiceInserter.CreateInvoices(16m);
+            invoiceInserter.CreateInvoices(13.5m);
+            invoiceInserter.CreateInvoices(22m);
+            invoiceInserter.CreateInvoices(15m);
+
+            // don't subtract internal days from total! This will be done in the invoice line
         }
     }
 }
