@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {  InvoiceDto, InvoiceYear } from './models';
 import { InvoiceStatus } from 'Components/Invoices/models';
+import { apiUri } from 'config';
+import { combinePdf, exportPeppol } from './DataService';
 
 interface IProps {
     invoices: InvoiceYear[];
@@ -11,6 +13,102 @@ interface IProps {
 const Invoices = (props: IProps) => {
 
     const { invoices, updateInvoiceStatus } = props;
+    const [isCombing, setIsCombining] = useState<{[key: number]: boolean}>({});
+    const [isExporting, setIsExporting] = useState<{[key: number]: boolean}>({});
+
+    const handleCombinePdfClick = (invoiceId: number) => {
+        // Create a hidden file input and trigger it
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.pdf';
+        fileInput.style.display = 'none';
+        
+        fileInput.onchange = (event) => {
+            const target = event.target as HTMLInputElement;
+            const file = target.files?.[0];
+            if (file) {
+                handleCombinePdfWithFile(invoiceId, file);
+            }
+            document.body.removeChild(fileInput);
+        };
+        
+        document.body.appendChild(fileInput);
+        fileInput.click();
+    };
+
+    const handleExportPeppolClick = (invoiceId: number) => {
+        // Create a hidden file input and trigger it
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.pdf';
+        fileInput.style.display = 'none';
+        
+        fileInput.onchange = (event) => {
+            const target = event.target as HTMLInputElement;
+            const file = target.files?.[0];
+            if (file) {
+                handleExportPeppolWithFile(invoiceId, file);
+            }
+            document.body.removeChild(fileInput);
+        };
+        
+        document.body.appendChild(fileInput);
+        fileInput.click();
+    };
+
+    const handleExportPeppolWithFile = async (invoiceId: number, file: File) => {
+        setIsExporting(prev => ({ ...prev, [invoiceId]: true }));
+        
+        try {
+            const result = await exportPeppol(
+                (error) => alert(`Fout: ${error}`),
+                invoiceId,
+                file
+            );
+            
+            // Create download link
+            const url = window.URL.createObjectURL(result.blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = result.filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            
+        } catch (error) {
+            console.error('Error exporting Peppol XML:', error);
+        } finally {
+            setIsExporting(prev => ({ ...prev, [invoiceId]: false }));
+        }
+    };
+
+    const handleCombinePdfWithFile = async (invoiceId: number, file: File) => {
+        setIsCombining(prev => ({ ...prev, [invoiceId]: true }));
+        
+        try {
+            const result = await combinePdf(
+                (error) => alert(`Fout: ${error}`),
+                invoiceId,
+                file
+            );
+            
+            // Create download link
+            const url = window.URL.createObjectURL(result.blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = result.filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            
+        } catch (error) {
+            console.error('Error combining PDF:', error);
+        } finally {
+            setIsCombining(prev => ({ ...prev, [invoiceId]: false }));
+        }
+    };
 
     return (
         <div>
@@ -51,10 +149,31 @@ const Invoices = (props: IProps) => {
                                             <td>{ x.total.toFixed(2) }</td>
                                             <td>{ InvoiceStatus[x.status] }</td>
                                             <td>
-                                                <a href={x.link} title="Bekijk pdf" target="_blank" rel="noreferrer"><i className="fa fa-file-pdf-o action-icon"></i></a>
-                                                { x.status === InvoiceStatus.Sent && 
-                                                    <button className="link" onClick={() => updateInvoiceStatus(x, InvoiceStatus.Paid)}><i className="fa fa-credit-card action-icon" title="Markeer als betaald"></i></button>
-                                                }
+                                                <div style={{display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap'}}>
+                                                    <a href={`${apiUri}Invoices/PrintPdf?id=${x.id}`} title="Bekijk pdf" target="_blank" rel="noreferrer"><i className="fa fa-file-pdf-o action-icon"></i></a>
+                                                    
+                                                    <button 
+                                                        className="link" 
+                                                        onClick={() => handleCombinePdfClick(x.id)}
+                                                        disabled={isCombing[x.id]}
+                                                        title="Combineer PDF met timesheet"
+                                                    >
+                                                        {isCombing[x.id] ? <i className="fa fa-spinner fa-spin action-icon"></i> : <i className="fa fa-paperclip action-icon"></i>}
+                                                    </button>
+
+                                                    <button 
+                                                        className="link" 
+                                                        onClick={() => handleExportPeppolClick(x.id)}
+                                                        disabled={isExporting[x.id]}
+                                                        title="Exporteer UBL XML"
+                                                    >
+                                                        {isExporting[x.id] ? <i className="fa fa-spinner fa-spin action-icon"></i> : <i className="fa fa-file-code-o action-icon"></i>}
+                                                    </button>
+
+                                                    { x.status === InvoiceStatus.Sent && 
+                                                        <button className="link" onClick={() => updateInvoiceStatus(x, InvoiceStatus.Paid)}><i className="fa fa-credit-card action-icon" title="Markeer als betaald"></i></button>
+                                                    }
+                                                </div>
                                             </td>
                                         </tr>
                                     )}

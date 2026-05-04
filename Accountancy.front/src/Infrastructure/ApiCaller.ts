@@ -43,6 +43,22 @@ export default class ApiCaller {
             });
     }
 
+    postFormData(onError: (message: string) => void, path: string, formData: FormData) {
+        const config: RequestInit = {
+            method: 'POST',
+            credentials: "include",
+            body: formData
+        }
+    
+        return fetch(this.baseUri + path, config)
+            .then(x => this.handlePostResponse(onError, x))
+            .catch(error => {
+                onError(error.message);
+                console.error(error);
+                throw error;
+            });
+    }
+
     private handlePostResponse(onError: (message: string) => void, response: Response) {
         if (response.ok)
             return { response, content: undefined as any };

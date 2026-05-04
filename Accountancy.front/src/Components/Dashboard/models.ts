@@ -17,5 +17,4 @@ export class InvoiceDto {
     receivingCompany!: string;
     status!: InvoiceStatus;
     total!: number;
-    link!: string;
 }

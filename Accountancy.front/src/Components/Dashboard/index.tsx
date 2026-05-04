@@ -30,7 +30,6 @@ const Dashboard = (props: DashboardProps) => {
     useAsyncEffect(async (isMounted) => {
         const data = await DataService.getDashboardInvoices(addNotificationError);
         if (isMounted()) {
-            data.forEach(invoice => invoice.link = `${apiUri}Invoices/PrintPdf?id=${invoice.id}`);
             setInvoices(data);
             setInvoiceYears(groupByYearAndMonth(data));
         }
