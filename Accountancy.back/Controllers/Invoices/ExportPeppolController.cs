@@ -94,7 +94,6 @@ public class ExportPeppolController : Controller
         var invoiceNr = $"{invoice.Year:0000}{invoice.Id:00000}";
         var issueDate = invoice.Date.ToString("yyyy-MM-dd");
         var dueDate = invoice.Date.AddDays(30).ToString("yyyy-MM-dd");
-        var invoiceLine = invoice.InvoiceLines.Single(); // we currently only support single lines
         if (invoice.ReceivingCompany.FullName != "Qframe NV")
             throw new Exception("We hardcoded Qframe here");
         
@@ -221,12 +220,18 @@ public class ExportPeppolController : Controller
         <cbc:PayableAmount currencyID=""EUR"">{invoice.Total.ToString("F2", CultureInfo.InvariantCulture)}</cbc:PayableAmount>
     </cac:LegalMonetaryTotal>
     
-    <cac:InvoiceLine>
-        <cbc:ID>1</cbc:ID>
+    {string.Join("\n    ", invoice.InvoiceLines.Select(RenderInvoiceLine))}
+</Invoice>";
+    }
+
+    private string RenderInvoiceLine(InvoiceLine invoiceLine, int i)
+    {
+        return $@"<cac:InvoiceLine>
+        <cbc:ID>{i + 1}</cbc:ID>
         <cbc:InvoicedQuantity unitCode=""DAY"">{invoiceLine.Amount.ToString("F2", CultureInfo.InvariantCulture)}</cbc:InvoicedQuantity>
-        <cbc:LineExtensionAmount currencyID= ""EUR"">{invoiceLine.TotalExclVat.ToString("F2", CultureInfo.InvariantCulture)}</cbc:LineExtensionAmount>
+        <cbc:LineExtensionAmount currencyID=""EUR"">{invoiceLine.TotalExclVat.ToString("F2", CultureInfo.InvariantCulture)}</cbc:LineExtensionAmount>
         <cac:Item>
-                <cbc:Name>Gepresteerde dagen</cbc:Name>
+                <cbc:Name>{System.Security.SecurityElement.Escape(invoiceLine.Description)}</cbc:Name>
                 <cac:ClassifiedTaxCategory>
                     <cbc:ID>S</cbc:ID>
                     <cbc:Percent>21.0</cbc:Percent>
@@ -238,8 +243,7 @@ public class ExportPeppolController : Controller
         <cac:Price>
             <cbc:PriceAmount currencyID=""EUR"">{invoiceLine.Price.ToString("F2", CultureInfo.InvariantCulture)}</cbc:PriceAmount>
         </cac:Price>
-    </cac:InvoiceLine>
-</Invoice>";
+    </cac:InvoiceLine>";
     }
 
     private MemoryStream CombinePdfs(MemoryStream invoicePdf, MemoryStream uploadedPdf)

@@ -16,6 +16,6 @@ public record InvoiceLine
     public string Description { get; set; }
     public decimal Amount { get; set; }
     public decimal Price { get; set; }
-    public decimal TotalExclVat => Amount * Price;
+    public decimal TotalExclVat => Math.Round(Amount * Price, 2, MidpointRounding.AwayFromZero);
     public VatType VatType { get; set; }
 }

@@ -73,8 +73,13 @@ namespace Accountancy.Migrations
 
                 if (SplitRoyalties)
                 {
-                    yield return new InvoiceLine("Gepresteerde dagen", amount.Value, Dagprijs * 3 / 4);
-                    yield return new InvoiceLine("Vergoeding overdracht auteursrechten", amount.Value, Dagprijs / 4);
+                    yield return new InvoiceLine("Gepresteerde dagen", amount.Value - (internalDays ?? 0), Dagprijs * 3 / 4);
+                    yield return new InvoiceLine("Vergoeding overdracht auteursrechten", amount.Value - (internalDays ?? 0), Dagprijs / 4);
+                    if (internalDays.HasValue)
+                    {
+                        yield return new InvoiceLine("Gepresteerde interne dagen", internalDays.Value, Dagprijs * 3 / 4);
+                        yield return new InvoiceLine("Vergoeding overdracht auteursrechten interne dagen", internalDays.Value, Dagprijs / 4);
+                    }
                 }
                 else
                 {
@@ -436,6 +441,10 @@ namespace Accountancy.Migrations
             invoiceInserter.CreateInvoices(13.5m);
             invoiceInserter.CreateInvoices(22m);
             invoiceInserter.CreateInvoices(15m);
+            invoiceInserter.CreateInvoices(18m, null, null, 3m);
+            invoiceInserter.SplitRoyalties = true;
+            invoiceInserter.CreateInvoices(24m, null, null, 1.5m);
+            invoiceInserter.CreateInvoices(14.50m, null, new[] { ("Variabele vergoeding 2025", 1m, 1847.22m) });
 
             // don't subtract internal days from total! This will be done in the invoice line
         }
